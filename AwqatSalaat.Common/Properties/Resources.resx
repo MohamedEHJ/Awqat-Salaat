@@ -651,6 +651,21 @@ Choose the calendar and set the desired year and month then click on Refresh</va
   <data name="Data.PrayerTimesService.CSV" xml:space="preserve">
     <value>CSV File</value>
   </data>
+  <data name="Data.PrayerTimesService.MawaqitApiSelfHosted" xml:space="preserve">
+    <value>self hosted mawaqit api</value>
+  </data>
+  <data name="UI.Settings.MawaqitBaseUrl" xml:space="preserve">
+    <value>Base URL</value>
+  </data>
+  <data name="UI.Settings.MawaqitBaseUrlDescription" xml:space="preserve">
+    <value>The base URL of your self-hosted Mawaqit API</value>
+  </data>
+  <data name="UI.Settings.MawaqitMasjidId" xml:space="preserve">
+    <value>Masjid ID</value>
+  </data>
+  <data name="UI.Settings.MawaqitMasjidIdDescription" xml:space="preserve">
+    <value>The identifier of the mosque on your Mawaqit API</value>
+  </data>
   <data name="UI.Settings.Load" xml:space="preserve">
     <value>Load</value>
   </data>

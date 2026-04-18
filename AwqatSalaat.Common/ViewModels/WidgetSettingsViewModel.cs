@@ -139,6 +139,16 @@ namespace AwqatSalaat.ViewModels
                         error = ServiceValdiationError.MissingCoordinates;
                     }
                     break;
+                case PrayerTimesService.MawaqitApiSelfHosted:
+                    if (string.IsNullOrWhiteSpace(Realtime.Mawaqit_BaseUrl))
+                    {
+                        error = ServiceValdiationError.MissingBaseUrl;
+                    }
+                    else if (string.IsNullOrWhiteSpace(Realtime.Mawaqit_MasjidId))
+                    {
+                        error = ServiceValdiationError.MissingMasjidId;
+                    }
+                    break;
                 case PrayerTimesService.CSV:
                     if (string.IsNullOrEmpty(Realtime.City))
                     {
@@ -227,7 +237,9 @@ namespace AwqatSalaat.ViewModels
                     Realtime.CSV_Map_Isha,
                     Realtime.CSV_Map_Date,
                     Realtime.CSV_Map_Day,
-                    Realtime.CSV_Map_Month
+                    Realtime.CSV_Map_Month,
+                    Realtime.Mawaqit_BaseUrl,
+                    Realtime.Mawaqit_MasjidId
                     );
             var previousServiceSettings = (
                     Settings.Service,
@@ -253,7 +265,9 @@ namespace AwqatSalaat.ViewModels
                     Settings.CSV_Map_Isha,
                     Settings.CSV_Map_Date,
                     Settings.CSV_Map_Day,
-                    Settings.CSV_Map_Month
+                    Settings.CSV_Map_Month,
+                    Settings.Mawaqit_BaseUrl,
+                    Settings.Mawaqit_MasjidId
                     );
             bool serviceSettingsChanged = previousServiceSettings != currentServiceSettings;
             Realtime.IsConfigured = true;
@@ -288,7 +302,9 @@ namespace AwqatSalaat.ViewModels
             MissingCsvDateColumn,
             MissingCsvDayOrMonthColumn,
             MissingCsvTimeColumn,
-            InvalidCsvFile
+            InvalidCsvFile,
+            MissingBaseUrl,
+            MissingMasjidId
         }
     }
 }

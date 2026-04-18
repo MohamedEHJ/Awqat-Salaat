@@ -7,6 +7,7 @@ using AwqatSalaat.Services.SalahHour;
 using AwqatSalaat.Services.Local;
 using AwqatSalaat.Services.QCH;
 using AwqatSalaat.Services.CSV;
+using AwqatSalaat.Services.MawaqitApiSelfHosted;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -479,7 +480,9 @@ namespace AwqatSalaat.ViewModels
             string country = null;
             string city = null;
 
-            if (WidgetSettings.Settings.Service == PrayerTimesService.SalahHour || WidgetSettings.Settings.Service == PrayerTimesService.QCH)
+            if (WidgetSettings.Settings.Service == PrayerTimesService.SalahHour
+                || WidgetSettings.Settings.Service == PrayerTimesService.QCH
+                || WidgetSettings.Settings.Service == PrayerTimesService.MawaqitApiSelfHosted)
             {
                 country = responseLocation?.Country;
                 city = responseLocation?.City;
@@ -514,6 +517,9 @@ namespace AwqatSalaat.ViewModels
                     break;
                 case PrayerTimesService.CSV:
                     serviceClient = new CsvClient();
+                    break;
+                case PrayerTimesService.MawaqitApiSelfHosted:
+                    serviceClient = new MawaqitApiSelfHostedClient();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -554,6 +560,13 @@ namespace AwqatSalaat.ViewModels
                     break;
                 case PrayerTimesService.CSV:
                     request = BuildCsvRequest();
+                    break;
+                case PrayerTimesService.MawaqitApiSelfHosted:
+                    request = new MawaqitApiSelfHostedRequest
+                    {
+                        BaseUrl = settings.Mawaqit_BaseUrl,
+                        MasjidId = settings.Mawaqit_MasjidId,
+                    };
                     break;
                 default:
                     return null;

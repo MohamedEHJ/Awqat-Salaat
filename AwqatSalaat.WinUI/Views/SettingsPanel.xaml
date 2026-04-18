@@ -529,6 +529,14 @@
                                     </ctrl:SettingsItem>
                                 </StackPanel>
                             </Grid>
+                            <StackPanel x:Name="mawaqitSettings" Margin="0,16,0,0">
+                                <ctrl:SettingsItem Header="{mk:I18n Key=UI.Settings.MawaqitBaseUrl}" Description="{mk:I18n Key=UI.Settings.MawaqitBaseUrlDescription}">
+                                    <TextBox Text="{x:Bind ViewModel.Realtime.Mawaqit_BaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FlowDirection="LeftToRight"/>
+                                </ctrl:SettingsItem>
+                                <ctrl:SettingsItem Header="{mk:I18n Key=UI.Settings.MawaqitMasjidId}" Description="{mk:I18n Key=UI.Settings.MawaqitMasjidIdDescription}">
+                                    <TextBox Text="{x:Bind ViewModel.Realtime.Mawaqit_MasjidId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FlowDirection="LeftToRight"/>
+                                </ctrl:SettingsItem>
+                            </StackPanel>
                         </StackPanel>
                     </NavigationViewItem.Tag>
                 </NavigationViewItem>

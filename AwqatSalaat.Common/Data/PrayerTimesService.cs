@@ -7,5 +7,6 @@
         Local = 2,
         QCH = 3,
         CSV = 4,
+        MawaqitApiSelfHosted = 5,
     }
 }

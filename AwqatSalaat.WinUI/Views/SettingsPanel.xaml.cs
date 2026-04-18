@@ -132,15 +132,17 @@ namespace AwqatSalaat.WinUI.Views
         {
             bool isQch = ViewModel.Realtime.Service == Data.PrayerTimesService.QCH;
             bool isCSV = ViewModel.Realtime.Service == Data.PrayerTimesService.CSV;
+            bool isMawaqit = ViewModel.Realtime.Service == Data.PrayerTimesService.MawaqitApiSelfHosted;
 
-            if (isQch || isCSV)
+            if (isQch || isCSV || isMawaqit)
             {
-                Log.Information($"Adjusting Settings panel content to the selected service. (QCH={isQch}, CSV={isCSV})");
+                Log.Information($"Adjusting Settings panel content to the selected service. (QCH={isQch}, CSV={isCSV}, Mawaqit={isMawaqit})");
             }
 
             qchCitySetting.Visibility = isQch ? Visibility.Visible : Visibility.Collapsed;
-            locationTab.Visibility = isQch || isCSV ? Visibility.Collapsed : Visibility.Visible;
+            locationTab.Visibility = isQch || isCSV || isMawaqit ? Visibility.Collapsed : Visibility.Visible;
             csvSettings.Visibility = isCSV ? Visibility.Visible : Visibility.Collapsed;
+            mawaqitSettings.Visibility = isMawaqit ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private async Task TrySetGeolocation()

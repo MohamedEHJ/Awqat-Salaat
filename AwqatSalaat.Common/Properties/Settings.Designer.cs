@@ -1102,5 +1102,29 @@ namespace AwqatSalaat.Properties {
                 this["Config_Isha_AdhanFile"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://129.151.242.51:8000")]
+        public string Mawaqit_BaseUrl {
+            get {
+                return ((string)(this["Mawaqit_BaseUrl"]));
+            }
+            set {
+                this["Mawaqit_BaseUrl"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Mawaqit_MasjidId {
+            get {
+                return ((string)(this["Mawaqit_MasjidId"]));
+            }
+            set {
+                this["Mawaqit_MasjidId"] = value;
+            }
+        }
     }
 }

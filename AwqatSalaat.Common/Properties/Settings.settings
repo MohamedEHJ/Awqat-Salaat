@@ -272,5 +272,11 @@
     <Setting Name="Config_Isha_AdhanFile" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="Mawaqit_BaseUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://129.151.242.51:8000</Value>
+    </Setting>
+    <Setting Name="Mawaqit_MasjidId" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
