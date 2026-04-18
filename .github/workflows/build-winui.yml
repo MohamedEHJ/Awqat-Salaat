@@ -1,0 +1,67 @@
+name: Build WinUI
+
+on:
+  push:
+    branches: [master, dev]
+    paths:
+      - 'AwqatSalaat.WinUI/**'
+      - 'AwqatSalaat.Common/**'
+      - '.github/workflows/build-winui.yml'
+  pull_request:
+    paths:
+      - 'AwqatSalaat.WinUI/**'
+      - 'AwqatSalaat.Common/**'
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: 'Build configuration'
+        required: true
+        default: 'Debug'
+        type: choice
+        options:
+          - Debug
+          - Release
+      platform:
+        description: 'Target platform'
+        required: true
+        default: 'x64'
+        type: choice
+        options:
+          - x64
+          - x86
+          - ARM64
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    env:
+      Configuration: ${{ github.event.inputs.configuration || 'Debug' }}
+      Platform: ${{ github.event.inputs.platform || 'x64' }}
+      Project: AwqatSalaat.WinUI\AwqatSalaat.WinUI.csproj
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 6 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages
+        run: msbuild $env:Project /t:Restore /p:Configuration=$env:Configuration /p:Platform=$env:Platform
+
+      - name: Build
+        run: msbuild $env:Project /p:Configuration=$env:Configuration /p:Platform=$env:Platform /p:RestorePackages=false
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: AwqatSalaat-WinUI-${{ env.Platform }}-${{ env.Configuration }}
+          path: AwqatSalaat.WinUI\bin\${{ env.Platform }}\${{ env.Configuration }}\net6.0-windows10.0.19041.0\
+          if-no-files-found: error
+          retention-days: 14
