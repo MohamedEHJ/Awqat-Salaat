@@ -269,7 +269,7 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <ToggleButton x:Name="toggle" IsChecked="{x:Bind flyout.IsOpen}" IsThreeState="False" Checked="ToggleButton_Checked" Padding="0" FontSize="12" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
+        <controls:ToggleButtonEx x:Name="toggle" IsChecked="{x:Bind flyout.IsOpen}" IsThreeState="False" Checked="ToggleButton_Checked" Padding="0" FontSize="12" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
             <Grid x:Name="btngrid">
                 <Grid.ContextFlyout>
                     <controls:CustomizedMenuFlyout ShouldConstrainToRootBounds="False" SystemBackdrop="{StaticResource DesktopAcrylicSystemBackdrop}">
@@ -367,6 +367,6 @@
                     </Grid>
                 </controls:CustomizedFlyout>
             </FlyoutBase.AttachedFlyout>
-        </ToggleButton>
+        </controls:ToggleButtonEx>
     </Grid>
 </UserControl>

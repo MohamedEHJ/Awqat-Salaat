@@ -236,4 +236,5 @@
     </Style>
 
     <Style TargetType="controls:ComboBoxEx" BasedOn="{StaticResource DefaultComboBoxStyle}"/>
+    <Style TargetType="controls:ToggleButtonEx" BasedOn="{StaticResource DefaultToggleButtonStyle}"/>
 </ResourceDictionary>
