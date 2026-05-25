@@ -157,7 +157,7 @@ namespace AwqatSalaat.ViewModels
                 UpdateNext();
             }
 
-            // Make sure there is no time jump and that adhan is desired
+            // Make sure there is no time jump
             if (!prayerTime.IsShuruq
                 && prayerTime.Time.Date == TimeStamp.Date
                 && prayerTime.Time.Hour == TimeStamp.Now.Hour

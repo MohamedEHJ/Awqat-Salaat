@@ -61,6 +61,11 @@ namespace AwqatSalaat.WinUI.Notification
             if (!m_isRegistered)
                 return false;
 
+#if DEBUG
+            if (time < DateTime.Now)
+                time = DateTime.Now.AddMinutes(1);
+#endif
+
             Log.Information($"Sending reminder toast notification for {prayer}. SoundEnabled={soundEnabled}");
 
             var prayer_loc = LocaleManager.Default.Get("Data.Salaat." + prayer);
@@ -71,7 +76,7 @@ namespace AwqatSalaat.WinUI.Notification
                 .SetScenario(AppNotificationScenario.Reminder)
                 .AddArgument("action", ToastClickAction)
                 .AddText(message)
-                .AddButton(new AppNotificationButton(LocaleManager.Default.Get("Notification.Dismiss"))
+                .AddButton(new AppNotificationButton(LocaleManager.Default.GetWithFallback("Notification.DismissReminder", "Notification.Dismiss"))
                     .AddArgument("action", DismissReminderAction));
 
             if (soundEnabled)
@@ -105,7 +110,7 @@ namespace AwqatSalaat.WinUI.Notification
                 .SetTag("timeentered" + prayer)
                 .AddArgument("action", ToastClickAction)
                 .AddText(message)
-                .AddButton(new AppNotificationButton(LocaleManager.Default.Get("Notification.Dismiss"))
+                .AddButton(new AppNotificationButton(LocaleManager.Default.GetWithFallback("Notification.DismissTimeEntered", "Notification.Dismiss"))
                     .AddArgument("action", DismissTimeEnteredNotificationAction));
 
             if (adhanEnabled)

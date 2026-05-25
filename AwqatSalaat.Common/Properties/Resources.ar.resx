@@ -798,4 +798,10 @@
   <data name="Notification.WidgetStillRunning" xml:space="preserve">
     <value>الأداة لا تزال قيد التشغيل. استخدم أيقونة درج النظام لإظهارها مجددا.</value>
   </data>
+  <data name="Notification.DismissTimeEntered" xml:space="preserve">
+    <value>حسنا، سأقوم إلى الصلاة</value>
+  </data>
+  <data name="Notification.DismissReminder" xml:space="preserve">
+    <value>حسنا، سأستعد للصلاة</value>
+  </data>
 </root>

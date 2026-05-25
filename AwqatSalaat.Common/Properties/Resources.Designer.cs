@@ -587,6 +587,24 @@ namespace AwqatSalaat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Okay, I will prepare to pray.
+        /// </summary>
+        public static string Notification_DismissReminder {
+            get {
+                return ResourceManager.GetString("Notification.DismissReminder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Okay, I will pray.
+        /// </summary>
+        public static string Notification_DismissTimeEntered {
+            get {
+                return ResourceManager.GetString("Notification.DismissTimeEntered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} time has entered now.
         /// </summary>
         public static string Notification_PrayerTimeEnteredFormat {
