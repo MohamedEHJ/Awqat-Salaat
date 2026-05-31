@@ -1150,5 +1150,17 @@ namespace AwqatSalaat.Properties {
                 this["ShowLocation"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowContentOnLockScreen {
+            get {
+                return ((bool)(this["ShowContentOnLockScreen"]));
+            }
+            set {
+                this["ShowContentOnLockScreen"] = value;
+            }
+        }
     }
 }

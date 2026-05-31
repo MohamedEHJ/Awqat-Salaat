@@ -1534,6 +1534,15 @@ namespace AwqatSalaat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must choose this app as the one to show detailed status on the lock screen..
+        /// </summary>
+        public static string UI_Settings_LockScreenDetailedStatusNote {
+            get {
+                return ResourceManager.GetString("UI.Settings.LockScreenDetailedStatusNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Longitude.
         /// </summary>
         public static string UI_Settings_Longitude {
@@ -1629,6 +1638,15 @@ namespace AwqatSalaat.Properties {
         public static string UI_Settings_NotificationSoundDescription {
             get {
                 return ResourceManager.GetString("UI.Settings.NotificationSoundDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open lock screen settings.
+        /// </summary>
+        public static string UI_Settings_OpenLockScreenSettings {
+            get {
+                return ResourceManager.GetString("UI.Settings.OpenLockScreenSettings", resourceCulture);
             }
         }
         
@@ -1782,6 +1800,24 @@ namespace AwqatSalaat.Properties {
         public static string UI_Settings_ShowAyahDescription {
             get {
                 return ResourceManager.GetString("UI.Settings.ShowAyahDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show content on the lock screen.
+        /// </summary>
+        public static string UI_Settings_ShowContentOnLockScreen {
+            get {
+                return ResourceManager.GetString("UI.Settings.ShowContentOnLockScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Allow the widget to show prayer time and countdown on the lock screen.
+        /// </summary>
+        public static string UI_Settings_ShowContentOnLockScreenDescription {
+            get {
+                return ResourceManager.GetString("UI.Settings.ShowContentOnLockScreenDescription", resourceCulture);
             }
         }
         

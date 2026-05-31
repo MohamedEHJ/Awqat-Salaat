@@ -10,6 +10,10 @@ using Serilog;
 using System;
 using System.Linq;
 using Windows.Foundation;
+#if PACKAGED
+using Windows.Data.Xml.Dom;
+using Windows.UI.Notifications;
+#endif
 
 namespace AwqatSalaat.WinUI.Views
 {
@@ -37,6 +41,9 @@ namespace AwqatSalaat.WinUI.Views
         private bool shouldBeCompactHorizontally;
         private DisplayMode currentDisplayMode = DisplayMode.Default;
         private AudioPlayerSession currentAudioSession;
+#if PACKAGED
+        private DispatcherTimer lockScreenTimer;
+#endif
 
         private WidgetViewModel ViewModel => DataContext as WidgetViewModel;
 
@@ -141,13 +148,16 @@ namespace AwqatSalaat.WinUI.Views
                 ThemeHelper.ReloadElementTheme(flyoutPresenter, currentTheme);
             }
         }
-
+        
         private void WidgetSummary_Loaded(object sender, RoutedEventArgs e)
         {
             Log.Information("Widget summary loaded");
             UpdateTheme();
             UpdateDisplayMode();
             UpdateDisplayMenu();
+#if PACKAGED
+            InvalidateLockScreenTimer();
+#endif
         }
 
         private void WidgetSummary_Unloaded(object sender, RoutedEventArgs e)
@@ -167,6 +177,17 @@ namespace AwqatSalaat.WinUI.Views
             DisplayHelper.DisplayChanged -= DisplayHelper_DisplayChanged;
 
             currentAudioSession?.End();
+
+#if PACKAGED
+            try
+            {
+                DestroyLockScreenTimer();
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"An error occured while destroying lock screen timer in Unloaded handler: {ex?.Message}");
+            }
+#endif
         }
 
         private void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -265,6 +286,9 @@ namespace AwqatSalaat.WinUI.Views
         private void WidgetSettings_Updated(bool apiSettingsUpdated)
         {
             UpdateNotificationSound();
+#if PACKAGED
+            InvalidateLockScreenTimer();
+#endif
         }
 
         private void LocaleManager_CurrentChanged(object sender, EventArgs e)
@@ -425,6 +449,90 @@ namespace AwqatSalaat.WinUI.Views
         {
             FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
         }
+
+#if PACKAGED
+        private void InvalidateLockScreenTimer()
+        {
+            try
+            {
+                Log.Information("Invalidating lock screen timer");
+
+                if (ViewModel.WidgetSettings.Settings.ShowContentOnLockScreen)
+                {
+                    if (lockScreenTimer is null)
+                    {
+                        Log.Information("Creating a timer for lock screen");
+                        lockScreenTimer = new DispatcherTimer();
+                        lockScreenTimer.Interval = TimeSpan.FromMinutes(1);
+                        lockScreenTimer.Tick += LockScreenTimer_Tick;
+                        lockScreenTimer.Start();
+                    }
+
+                    UpdateLockScreen();
+                }
+                else
+                {
+                    DestroyLockScreenTimer();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, $"An exception was thrown during lock screen timer invalidation: {ex?.Message}");
+            }
+        }
+
+        private void DestroyLockScreenTimer()
+        {
+            if (lockScreenTimer is not null)
+            {
+                Log.Information("Destroying the lock screen timer");
+                lockScreenTimer.Stop();
+                lockScreenTimer.Tick -= LockScreenTimer_Tick;
+                lockScreenTimer = null;
+            }
+
+            TileUpdateManager.CreateTileUpdaterForApplication().Clear();
+        }
+
+        private void LockScreenTimer_Tick(object sender, object e)
+        {
+            UpdateLockScreen();
+        }
+
+        private void UpdateLockScreen()
+        {
+            try
+            {
+                if (!ViewModel.WidgetSettings.Settings.IsConfigured)
+                {
+                    return;
+                }
+
+                if (ViewModel.HasError)
+                {
+                    TileUpdateManager.CreateTileUpdaterForApplication().Clear();
+                    return;
+                }
+
+                Log.Information("Updating the content on the lock screen");
+
+                string line3 = (afterTB.Visibility == Visibility.Visible ? afterTB : sinceTB).Text + " " + countdownTB.Text;
+                string content = $"<tile><visual version=\"4\"><binding template=\"TileWide\">" +
+                    $"<text id=\"1\">{prayerTB.Text}</text>" +
+                    $"<text id=\"2\">{timeTB.Text}</text>" +
+                    $"<text id=\"3\">{line3}</text>" +
+                    $"</binding></visual></tile>";
+                var tileXml = new XmlDocument();
+                tileXml.LoadXml(content);
+                var notification = new TileNotification(tileXml);
+                TileUpdateManager.CreateTileUpdaterForApplication().Update(notification);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, $"An error occured while updating lock screen: {ex?.Message}");
+            }
+        }
+#endif
     }
 
     public enum DisplayMode

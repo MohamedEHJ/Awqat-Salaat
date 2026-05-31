@@ -65,6 +65,10 @@ namespace AwqatSalaat.WinUI.Views
             SetImageSource();
 
             nav.SelectionChanged += Nav_SelectionChanged;
+
+#if !PACKAGED && !DEBUG
+            lockScreenSetting.Visibility = Visibility.Collapsed;
+#endif
         }
 
         private void Nav_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -241,6 +245,12 @@ namespace AwqatSalaat.WinUI.Views
             {
                 ViewModel.Locator.SelectedPlace = place;
             }
+        }
+
+        private void LockScreenHyperlink_Click(Hyperlink sender, HyperlinkClickEventArgs args)
+        {
+            Log.Information("Clicked on Lock screen settings link");
+            Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:lockscreen"));
         }
 
         private void ContactHyperlink_Click(Hyperlink sender, HyperlinkClickEventArgs args)
