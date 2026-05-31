@@ -635,7 +635,7 @@
                                 <ctrl:SettingsItem Margin="0" Header="{mk:I18n Key=UI.Settings.LocationByCoordinates}" Description="{mk:I18n Key=UI.Settings.LocationByCoordinatesDescription}" IsEnabled="{x:Bind ViewModel.Locator.DetectByCoordinates, Mode=OneWay}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="170"/>
                                             <ColumnDefinition Width="150"/>
                                             <ColumnDefinition/>
                                         </Grid.ColumnDefinitions>
@@ -650,7 +650,10 @@
                                         <TextBox Text="{x:Bind ViewModel.Realtime.Latitude, Converter={StaticResource DecimalConverter}}" Grid.Column="1"/>
                                         <TextBlock Text="{mk:I18n Key=UI.Settings.Longitude}" Grid.Row="2"/>
                                         <TextBox Text="{x:Bind ViewModel.Realtime.Longitude, Converter={StaticResource DecimalConverter}}" Grid.Column="1" Grid.Row="2"/>
-                                        <Button Content="{mk:I18n Key=UI.Settings.Check}" Command="{x:Bind ViewModel.Locator.Check, Mode=OneWay}" Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                        <StackPanel Orientation="Horizontal" Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                            <Button Content="{mk:I18n Key=UI.Settings.Check}" Command="{x:Bind ViewModel.Locator.Check, Mode=OneWay}"/>
+                                            <Button Content="{mk:I18n Key=UI.Settings.AutoDetect}" Margin="4,0,0,0" Click="DetectLocation_Click"/>
+                                        </StackPanel>
                                         <Grid x:DefaultBindMode="OneWay" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Visibility="{x:Bind ViewModel.Locator.PendingCheck}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition/>

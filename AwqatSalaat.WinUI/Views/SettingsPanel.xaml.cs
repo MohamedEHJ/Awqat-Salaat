@@ -98,7 +98,7 @@ namespace AwqatSalaat.WinUI.Views
                 {
                     nav.SelectedItem = locationTab;
 
-                    TrySetGeolocation();
+                    TrySetGeolocation(false);
                 }
             }
 
@@ -148,7 +148,7 @@ namespace AwqatSalaat.WinUI.Views
             csvSettings.Visibility = isCSV ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private async Task TrySetGeolocation()
+        private async Task TrySetGeolocation(bool notifyIfNotAllowed)
         {
             try
             {
@@ -172,6 +172,11 @@ namespace AwqatSalaat.WinUI.Views
                 }
                 else
                 {
+                    if (notifyIfNotAllowed)
+                    {
+                        MessageBox.Warning(LocaleManager.Default.Get("Dialog.LocationAccessDenied"));
+                    }
+
                     Log.Information("Auto-geolocation: Access denied");
                 }
             }
@@ -467,5 +472,12 @@ namespace AwqatSalaat.WinUI.Views
         }
 
         private bool AND(bool left, bool right) => left && right;
+
+        private void DetectLocation_Click(object sender, RoutedEventArgs e)
+        {
+            Log.Information("Clicked on Auto-detect for location");
+
+            TrySetGeolocation(true);
+        }
     }
 }

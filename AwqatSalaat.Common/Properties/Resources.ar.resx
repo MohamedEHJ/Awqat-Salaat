@@ -816,4 +816,10 @@
   <data name="UI.Settings.LockScreenDetailedStatusNote" xml:space="preserve">
     <value>يجب عليك اختيار هذا التطبيق بصفته المسؤول عن إظهار الحالة التفصيلية على شاشة القفل.</value>
   </data>
+  <data name="UI.Settings.AutoDetect" xml:space="preserve">
+    <value>كشف تلقائي</value>
+  </data>
+  <data name="Dialog.LocationAccessDenied" xml:space="preserve">
+    <value>لم يتم السماح بالوصول إلى الموقع.</value>
+  </data>
 </root>

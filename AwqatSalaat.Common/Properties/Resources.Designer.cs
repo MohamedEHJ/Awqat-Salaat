@@ -494,6 +494,15 @@ namespace AwqatSalaat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not allowed to access location..
+        /// </summary>
+        public static string Dialog_LocationAccessDenied {
+            get {
+                return ResourceManager.GetString("Dialog.LocationAccessDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The logs file does not exist. It may not be created yet..
         /// </summary>
         public static string Dialog_LogsFileNotFound {
@@ -1044,6 +1053,15 @@ namespace AwqatSalaat.Properties {
         public static string UI_Settings_AutoAlignmentDescription {
             get {
                 return ResourceManager.GetString("UI.Settings.AutoAlignmentDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Auto detect.
+        /// </summary>
+        public static string UI_Settings_AutoDetect {
+            get {
+                return ResourceManager.GetString("UI.Settings.AutoDetect", resourceCulture);
             }
         }
         
