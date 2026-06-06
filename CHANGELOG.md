@@ -1,3 +1,8 @@
+### v4.2.1
+
+- Avoid the port exhaustion problem in service clients.
+- Implemented a fix for the re-rentrancy bug caused by TileNotification in the widget's button Loaded event. (WinUI through Microsoft Store only)
+
 ### v4.2
 
 - Support multi-display desktops. (WinUI only)

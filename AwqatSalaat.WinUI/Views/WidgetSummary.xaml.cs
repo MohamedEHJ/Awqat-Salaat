@@ -287,7 +287,7 @@ namespace AwqatSalaat.WinUI.Views
         {
             UpdateNotificationSound();
 #if PACKAGED
-            InvalidateLockScreenTimer();
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, UpdateLockScreen);
 #endif
         }
 

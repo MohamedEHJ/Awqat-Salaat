@@ -12,6 +12,14 @@ namespace AwqatSalaat.Services.SalahHour
     {
         public bool SupportMonthlyData => true;
 
+        // Use a static HttpClient to avoid port-exhaustion problem
+        private static readonly HttpClient _httpClient = new HttpClient();
+
+        static SalahHourClient()
+        {
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", "Awqat Salaat");
+        }
+
         public async Task<ServiceData> GetDataAsync(IRequest request)
         {
             var req = (SalahHourRequest)request;
@@ -48,36 +56,32 @@ namespace AwqatSalaat.Services.SalahHour
         {
             try
             {
-                using (HttpClient client = new HttpClient())
+                var url = request.GetUrl();
+                Log.Debug($"[Salah-Hour] Getting data from: {url}");
+                var httpResponse = await _httpClient.GetAsync(url);
+                Log.Debug($"[Salah-Hour] Response status code: {httpResponse.StatusCode}");
+
+                if (httpResponse.IsSuccessStatusCode)
                 {
-                    client.DefaultRequestHeaders.Add("User-Agent", "Awqat Salaat");
-                    var url = request.GetUrl();
-                    Log.Debug($"[Salah-Hour] Getting data from: {url}");
-                    var httpResponse = await client.GetAsync(url);
-                    Log.Debug($"[Salah-Hour] Response status code: {httpResponse.StatusCode}");
+                    string responseBody = await httpResponse.Content.ReadAsStringAsync();
 
-                    if (httpResponse.IsSuccessStatusCode)
+                    if (string.IsNullOrEmpty(responseBody))
                     {
-                        string responseBody = await httpResponse.Content.ReadAsStringAsync();
-
-                        if (string.IsNullOrEmpty(responseBody))
-                        {
-                            throw new SalahHourApiException("Salah Hour service did not respond with data.");
-                        }
-
-                        T apiResponse = JsonConvert.DeserializeObject<T>(responseBody);
-
-                        if (!apiResponse.Success)
-                        {
-                            throw new SalahHourApiException(apiResponse.Message);
-                        }
-
-                        return apiResponse;
+                        throw new SalahHourApiException("Salah Hour service did not respond with data.");
                     }
-                    else
+
+                    T apiResponse = JsonConvert.DeserializeObject<T>(responseBody);
+
+                    if (!apiResponse.Success)
                     {
-                        throw new SalahHourApiException($"Something went wrong: {httpResponse.ReasonPhrase} (StatusCode={httpResponse.StatusCode})");
+                        throw new SalahHourApiException(apiResponse.Message);
                     }
+
+                    return apiResponse;
+                }
+                else
+                {
+                    throw new SalahHourApiException($"Something went wrong: {httpResponse.ReasonPhrase} (StatusCode={httpResponse.StatusCode})");
                 }
             }
             catch (HttpRequestException hre)
