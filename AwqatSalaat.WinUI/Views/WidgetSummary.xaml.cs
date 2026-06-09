@@ -156,7 +156,7 @@ namespace AwqatSalaat.WinUI.Views
             UpdateDisplayMode();
             UpdateDisplayMenu();
 #if PACKAGED
-            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, UpdateLockScreen);
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, InvalidateLockScreenTimer);
 #endif
         }
 
@@ -287,7 +287,7 @@ namespace AwqatSalaat.WinUI.Views
         {
             UpdateNotificationSound();
 #if PACKAGED
-            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, UpdateLockScreen);
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, InvalidateLockScreenTimer);
 #endif
         }
 
