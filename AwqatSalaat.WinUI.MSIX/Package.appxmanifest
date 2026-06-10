@@ -12,7 +12,7 @@
     <Identity
         Name="Khiro.AwqatSalaatWinUI"
         Publisher="CN=C005A407-3926-439C-B560-3187F3293A86"
-        Version="4.2.2.0" />
+        Version="4.2.3.0" />
 
     <Properties>
         <DisplayName>ms-resource:AppDisplayName</DisplayName>

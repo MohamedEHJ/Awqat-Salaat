@@ -1,3 +1,8 @@
+### v4.2.3
+
+- Fixed a regression related to showing content on the lock screen. (WinUI through Microsoft Store only)
+- Fixed bugs in handling duplicated primary display. (WinUI only)
+
 ### v4.2.2
 
 - Implemented a fix for the re-rentrancy bug caused by TileNotification in the widget's button Loaded event. (WinUI through Microsoft Store only)
@@ -5,7 +10,7 @@
 ### v4.2.1
 
 - Avoid the port exhaustion problem in service clients.
-- Implemented a fix for the re-rentrancy bug caused by TileNotification in the widget's button ~~Loaded~~ *settings updated* event. (WinUI through Microsoft Store only)
+- Implemented a fix for the re-rentrancy bug caused by TileNotification in the widget's ~~Loaded~~ *settings updated* event. (WinUI through Microsoft Store only)
 
 ### v4.2
 

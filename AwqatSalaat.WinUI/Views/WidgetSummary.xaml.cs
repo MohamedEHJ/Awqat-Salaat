@@ -80,7 +80,9 @@ namespace AwqatSalaat.WinUI.Views
             if (e.Reason
                 is DisplayChangedReason.Connected
                 or DisplayChangedReason.Disconnected
-                or DisplayChangedReason.PrimaryDisplay)
+                or DisplayChangedReason.PrimaryDisplay
+                or DisplayChangedReason.PrimaryDuplicated
+                or DisplayChangedReason.PrimaryDeduplicated)
             {
                 DispatcherQueue.TryEnqueue(UpdateDisplayMenu);
             }
@@ -156,7 +158,7 @@ namespace AwqatSalaat.WinUI.Views
             UpdateDisplayMode();
             UpdateDisplayMenu();
 #if PACKAGED
-            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, UpdateLockScreen);
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, InvalidateLockScreenTimer);
 #endif
         }
 
@@ -287,7 +289,7 @@ namespace AwqatSalaat.WinUI.Views
         {
             UpdateNotificationSound();
 #if PACKAGED
-            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, UpdateLockScreen);
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, InvalidateLockScreenTimer);
 #endif
         }
 
