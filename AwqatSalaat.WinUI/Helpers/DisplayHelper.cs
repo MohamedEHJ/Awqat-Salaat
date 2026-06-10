@@ -26,7 +26,7 @@ namespace AwqatSalaat.WinUI.Helpers
         public static event EventHandler<DisplayChangedEventArgs> DisplayChanged;
 
         public static IEnumerable<DisplayEntity> AvailableDisplays => data.Values;
-        public static DisplayEntity PrimaryDisplay => data.Values.SingleOrDefault(d => d.IsPrimary);
+        public static DisplayEntity PrimaryDisplay => data.Values.FirstOrDefault(d => d.IsPrimary);
 
         static DisplayHelper()
         {
@@ -195,12 +195,36 @@ namespace AwqatSalaat.WinUI.Helpers
                 // Some display settings were changed
                 else
                 {
-                    var oldPrimary = data.Values.Single(d => d.IsPrimary);
-                    var newPrimary = current.Values.Single(d => d.IsPrimary);
+                    var oldPrimaries = data.Values.Where(d => d.IsPrimary).ToArray();
+                    var currentPrimaries = current.Values.Where(d => d.IsPrimary).ToArray();
 
-                    // Another display became primary
-                    if (!oldPrimary.Display.DevicePath.Equals(newPrimary.Display.DevicePath))
+                    // Primary display duplicated
+                    if (currentPrimaries.Length > oldPrimaries.Length)
                     {
+                        var newPrimary = currentPrimaries
+                            .ExceptBy(oldPrimaries.Select(d => d.Display.DevicePath), d => d.Display.DevicePath)
+                            .First();
+                        data[newPrimary.Display.DevicePath] = newPrimary;
+                        Log.Information($"Primary display is duplicated: {string.Join('\n', currentPrimaries.Select(d => d.Display.DevicePath))}");
+                        args = new DisplayChangedEventArgs(DisplayChangedReason.PrimaryDuplicated, newPrimary);
+                    }
+                    // Primary display deduplicated
+                    else if (currentPrimaries.Length < oldPrimaries.Length)
+                    {
+                        var deduplicated = oldPrimaries
+                            .ExceptBy(currentPrimaries.Select(d => d.Display.DevicePath), d => d.Display.DevicePath)
+                            .First();
+                        deduplicated = current[deduplicated.Display.DevicePath];
+                        data[deduplicated.Display.DevicePath] = deduplicated;
+                        Log.Information($"Primary display is deduplicated: {string.Join('\n', currentPrimaries.Select(d => d.Display.DevicePath))}");
+                        args = new DisplayChangedEventArgs(DisplayChangedReason.PrimaryDeduplicated, deduplicated);
+                    }
+                    // Another display became primary
+                    else if (!oldPrimaries[0].Display.DevicePath.Equals(currentPrimaries[0].Display.DevicePath))
+                    {
+                        var oldPrimary = oldPrimaries[0];
+                        var newPrimary = currentPrimaries[0];
+
                         data[oldPrimary.Display.DevicePath] = current[oldPrimary.Display.DevicePath];
                         data[newPrimary.Display.DevicePath] = current[newPrimary.Display.DevicePath];
                         Log.Information($"New primary display: {newPrimary.Summary}");
@@ -295,7 +319,9 @@ namespace AwqatSalaat.WinUI.Helpers
         Connected = 1,
         Disconnected = 2,
         PrimaryDisplay = 3,
-        Resolution = 4,
-        Dpi = 5,
+        PrimaryDuplicated = 4,
+        PrimaryDeduplicated = 5,
+        Resolution = 6,
+        Dpi = 7,
     }
 }

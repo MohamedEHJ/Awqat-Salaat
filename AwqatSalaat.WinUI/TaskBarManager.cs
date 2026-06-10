@@ -100,8 +100,15 @@ namespace AwqatSalaat.WinUI
                 Log.Information("Moving the widget to the new primary display");
                 dispatcher.TryEnqueue(HideThenShow);
             }
+            else if (e.Reason is DisplayChangedReason.PrimaryDuplicated or DisplayChangedReason.PrimaryDeduplicated
+                && displaySetting != "PRIMARY"
+                && latestDisplay == affectedDisplay)
+            {
+                Log.Information("Re-showing the widget because the primary display was (de)duplicated to/from the current display");
+                dispatcher.TryEnqueue(HideThenShow);
+            }
             // If the widget is shown in the dosconnected display, then we need to move it to another one
-            if (e.Reason == DisplayChangedReason.Disconnected && affectedDisplay == latestDisplay)
+            else if (e.Reason == DisplayChangedReason.Disconnected && affectedDisplay == latestDisplay)
             {
                 // Wait a little to ensure the widget is destroyed if it was previously visible
                 Task.Delay(100).ContinueWith(t =>

@@ -80,7 +80,9 @@ namespace AwqatSalaat.WinUI.Views
             if (e.Reason
                 is DisplayChangedReason.Connected
                 or DisplayChangedReason.Disconnected
-                or DisplayChangedReason.PrimaryDisplay)
+                or DisplayChangedReason.PrimaryDisplay
+                or DisplayChangedReason.PrimaryDuplicated
+                or DisplayChangedReason.PrimaryDeduplicated)
             {
                 DispatcherQueue.TryEnqueue(UpdateDisplayMenu);
             }
