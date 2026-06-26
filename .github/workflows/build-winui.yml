@@ -57,13 +57,13 @@ jobs:
       - name: Restore NuGet packages
         run: msbuild $env:Project /t:Restore /p:Configuration=$env:Configuration /p:Platform=$env:Platform
 
-      - name: Build
-        run: msbuild $env:Project /p:Configuration=$env:Configuration /p:Platform=$env:Platform /p:RestorePackages=false
+      - name: Publish (self-contained)
+        run: msbuild $env:Project /t:Publish /p:Configuration=$env:Configuration /p:Platform=$env:Platform /p:RuntimeIdentifier=win-x64 /p:RestorePackages=false
 
       - name: Upload build output
         uses: actions/upload-artifact@v4
         with:
           name: AwqatSalaat-WinUI-${{ env.Platform }}-${{ env.Configuration }}
-          path: AwqatSalaat.WinUI\bin\${{ env.Platform }}\${{ env.Configuration }}\net6.0-windows10.0.19041.0\
+          path: AwqatSalaat.WinUI\bin\${{ env.Platform }}\${{ env.Configuration }}\net6.0-windows10.0.19041.0\win-x64\publish\
           if-no-files-found: error
           retention-days: 14

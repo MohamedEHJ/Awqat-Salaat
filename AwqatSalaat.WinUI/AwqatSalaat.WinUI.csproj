@@ -13,13 +13,27 @@
         <ApplicationIcon>Assets/as_ico_win11.ico</ApplicationIcon>
 
         <WindowsPackageType Condition="'$(IsPackaged)'==''">None</WindowsPackageType>
-        <SelfContained>false</SelfContained>
         <AppContainerApplication>true</AppContainerApplication>
 
         <Product>Awqat Salaat WinUI</Product>
     </PropertyGroup>
 
+    <!--
+      Distribution hors-Store (non packagée) : on embarque le runtime .NET et le
+      Windows App Runtime dans la sortie. Les utilisateurs n'ont donc plus besoin
+      d'installer .NET 6 ni le Windows App Runtime séparément. Cible : x64.
+    -->
+    <PropertyGroup Condition="'$(IsPackaged)'!='true'">
+        <SelfContained>true</SelfContained>
+        <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    </PropertyGroup>
+
     <PropertyGroup Condition="'$(IsPackaged)'=='true'">
+        <!-- Build MSIX/Store : les dépendances sont déclarées dans le manifeste
+             et résolues par le Store, pas embarquées. -->
+        <SelfContained>false</SelfContained>
+
         <DefineConstants>$(DefineConstants);PACKAGED</DefineConstants>
 
         <SignAssembly>True</SignAssembly>
