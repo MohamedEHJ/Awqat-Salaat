@@ -23,7 +23,9 @@
             </Code>
         </Task>
     </UsingTask>
-    <Target Name="HarvestAppFiles">
+    <!-- Skip harvesting during NuGet restore: the referenced app isn't built yet,
+         so reading its assembly version would fail with FileNotFoundException. -->
+    <Target Name="HarvestAppFiles" Condition="'$(MSBuildRestoreSessionId)' == ''">
         <!-- This task allow us to get the directory and the full path of the compiled dll -->
         <MSBuild Projects="$(AwqatSalaatProject)" Targets="GetTargetPath" Properties="Platform=$(Platform)">
             <Output TaskParameter="TargetOutputs" ItemName="DllOutput" />

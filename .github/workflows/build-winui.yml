@@ -59,6 +59,9 @@ jobs:
       - name: Restore NuGet packages
         run: msbuild $env:Project /t:Restore /p:Configuration=$env:Configuration /p:Platform=$env:Platform
 
+      - name: Build app (produces the assembly WiX harvests)
+        run: msbuild AwqatSalaat.WinUI\AwqatSalaat.WinUI.csproj /t:Build /p:Configuration=$env:Configuration /p:Platform=$env:Platform /p:RestorePackages=false
+
       - name: Build MSI installer
         run: msbuild $env:Project /t:Build /p:Configuration=$env:Configuration /p:Platform=$env:Platform /p:RestorePackages=false
 
