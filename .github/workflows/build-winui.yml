@@ -5,11 +5,13 @@ on:
     branches: [master, dev]
     paths:
       - 'AwqatSalaat.WinUI/**'
+      - 'AwqatSalaat.WinUI.Package/**'
       - 'AwqatSalaat.Common/**'
       - '.github/workflows/build-winui.yml'
   pull_request:
     paths:
       - 'AwqatSalaat.WinUI/**'
+      - 'AwqatSalaat.WinUI.Package/**'
       - 'AwqatSalaat.Common/**'
   workflow_dispatch:
     inputs:
@@ -38,7 +40,7 @@ jobs:
     env:
       Configuration: ${{ github.event.inputs.configuration || 'Debug' }}
       Platform: ${{ github.event.inputs.platform || 'x64' }}
-      Project: AwqatSalaat.WinUI\AwqatSalaat.WinUI.csproj
+      Project: AwqatSalaat.WinUI.Package\AwqatSalaat.WinUI.Package.wixproj
 
     steps:
       - name: Checkout
@@ -57,13 +59,13 @@ jobs:
       - name: Restore NuGet packages
         run: msbuild $env:Project /t:Restore /p:Configuration=$env:Configuration /p:Platform=$env:Platform
 
-      - name: Publish (self-contained)
-        run: msbuild $env:Project /t:Publish /p:Configuration=$env:Configuration /p:Platform=$env:Platform /p:RuntimeIdentifier=win-x64 /p:RestorePackages=false
+      - name: Build MSI installer
+        run: msbuild $env:Project /t:Build /p:Configuration=$env:Configuration /p:Platform=$env:Platform /p:RestorePackages=false
 
-      - name: Upload build output
+      - name: Upload MSI
         uses: actions/upload-artifact@v4
         with:
-          name: AwqatSalaat-WinUI-${{ env.Platform }}-${{ env.Configuration }}
-          path: AwqatSalaat.WinUI\bin\${{ env.Platform }}\${{ env.Configuration }}\net6.0-windows10.0.19041.0\win-x64\publish\
+          name: AwqatSalaat-WinUI-${{ env.Platform }}-${{ env.Configuration }}-msi
+          path: AwqatSalaat.WinUI.Package\bin\${{ env.Platform }}\${{ env.Configuration }}\*.msi
           if-no-files-found: error
           retention-days: 14
