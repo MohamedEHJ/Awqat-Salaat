@@ -3,7 +3,7 @@
         <AwqatSalaatProject>..\AwqatSalaat.WinUI\AwqatSalaat.WinUI.csproj</AwqatSalaatProject>
         <EnableProjectHarvesting>false</EnableProjectHarvesting>
         <HarvestDirectorySuppressUniqueIds>true</HarvestDirectorySuppressUniqueIds>
-        <HarvestDirectoryTransforms>..\AwqatSalaat.Package\RemovePdbTransform.xslt</HarvestDirectoryTransforms>
+        <HarvestDirectoryTransforms>RemovePdbAndLanguageTransform.xslt</HarvestDirectoryTransforms>
     </PropertyGroup>
     <UsingTask TaskName="GetVersionString" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
         <ParameterGroup>
