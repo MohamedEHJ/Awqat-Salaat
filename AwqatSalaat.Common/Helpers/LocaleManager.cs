@@ -44,18 +44,23 @@ namespace AwqatSalaat.Helpers
             return Properties.Resources.ResourceManager.GetString(key, culture);
         }
 
+        public string GetWithFallback(string key, string fallbackKey)
+        {
+            var culture = CurrentCulture.ThreeLetterISOLanguageName == "ckb"
+                ? CultureInfo.GetCultureInfo("ku")
+                : Properties.Resources.Culture;
+            var manager = Properties.Resources.ResourceManager;
+            var rs = manager.GetResourceSet(culture, false, false);
+            return rs.GetString(key) ?? manager.GetString(fallbackKey, culture);
+        }
+
         private void SetLocale(string locale)
         {
             Log.Information($"Setting locale: {locale}");
 
-            if (locale == _current)
+            if (string.IsNullOrEmpty(locale) || locale.Equals(_current, StringComparison.OrdinalIgnoreCase))
             {
                 return;
-            }
-
-            if (locale is null)
-            {
-                throw new ArgumentNullException(nameof(locale));
             }
 
             if (locale.Length != 2 || locale.ToLower().Any(c => c < 'a' || c > 'z'))

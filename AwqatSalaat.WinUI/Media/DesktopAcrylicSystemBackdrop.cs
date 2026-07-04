@@ -8,6 +8,7 @@ namespace AwqatSalaat.WinUI.Media
     internal class DesktopAcrylicSystemBackdrop : SystemBackdrop
     {
         private DesktopAcrylicController acrylicController;
+        private int count = 0;
 
         protected override void OnTargetConnected(ICompositionSupportsSystemBackdrop connectedTarget, XamlRoot xamlRoot)
         {
@@ -24,15 +25,24 @@ namespace AwqatSalaat.WinUI.Media
             }
 
             // Add target.
-            acrylicController.AddSystemBackdropTarget(connectedTarget);
+            bool success = acrylicController.AddSystemBackdropTarget(connectedTarget);
+
+            if (success)
+            {
+                count++;
+            }
         }
 
         protected override void OnTargetDisconnected(ICompositionSupportsSystemBackdrop disconnectedTarget)
         {
             base.OnTargetDisconnected(disconnectedTarget);
 
-            acrylicController.RemoveSystemBackdropTarget(disconnectedTarget);
-            acrylicController = null;
+            bool success = acrylicController.RemoveSystemBackdropTarget(disconnectedTarget);
+
+            if (success && --count == 0)
+            {
+                acrylicController = null;
+            }
         }
     }
 }

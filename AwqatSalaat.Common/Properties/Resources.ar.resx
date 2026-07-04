@@ -768,4 +768,58 @@
     <value>تعذر تهيئة إشعارات ويندوز.
 تأكد من تثبيت Windows App Runtime Singleton نسخة 1.5.</value>
   </data>
+  <data name="UI.ContextMenu.Display" xml:space="preserve">
+    <value>شاشة العرض</value>
+  </data>
+  <data name="UI.ContextMenu.AlwaysPrimary" xml:space="preserve">
+    <value>الرئيسية دائما</value>
+  </data>
+  <data name="UI.Settings.Color" xml:space="preserve">
+    <value>اللون</value>
+  </data>
+  <data name="Config.WidgetButtonBackgroundType.None" xml:space="preserve">
+    <value>لا شيء</value>
+  </data>
+  <data name="Config.WidgetButtonBackgroundType.SolidColor" xml:space="preserve">
+    <value>لون موحد</value>
+  </data>
+  <data name="UI.Settings.TaskbarButtonBackground" xml:space="preserve">
+    <value>خلفية زر شريط المهام</value>
+  </data>
+  <data name="UI.Settings.TaskbarButtonBackgroundDescription" xml:space="preserve">
+    <value>الخلفية الخاصة بزر الأداة على شريط المهام</value>
+  </data>
+  <data name="UI.Settings.ShowLocation" xml:space="preserve">
+    <value>إظهار الموقع</value>
+  </data>
+  <data name="UI.Settings.ShowLocationDescription" xml:space="preserve">
+    <value>تمكين أو تعطيل إظهار الموقع في لوحة الصلوات</value>
+  </data>
+  <data name="Notification.WidgetStillRunning" xml:space="preserve">
+    <value>الأداة لا تزال قيد التشغيل. استخدم أيقونة درج النظام لإظهارها مجددا.</value>
+  </data>
+  <data name="Notification.DismissTimeEntered" xml:space="preserve">
+    <value>حسنا، سأقوم إلى الصلاة</value>
+  </data>
+  <data name="Notification.DismissReminder" xml:space="preserve">
+    <value>حسنا، سأستعد للصلاة</value>
+  </data>
+  <data name="UI.Settings.ShowContentOnLockScreen" xml:space="preserve">
+    <value>إظهار المحتوى على شاشة القفل</value>
+  </data>
+  <data name="UI.Settings.ShowContentOnLockScreenDescription" xml:space="preserve">
+    <value>السماح للأداة بإظهار وقت الصلاة والعد العكسي على شاشة القفل</value>
+  </data>
+  <data name="UI.Settings.OpenLockScreenSettings" xml:space="preserve">
+    <value>فتح إعدادات شاشة القفل</value>
+  </data>
+  <data name="UI.Settings.LockScreenDetailedStatusNote" xml:space="preserve">
+    <value>يجب عليك اختيار هذا التطبيق بصفته المسؤول عن إظهار الحالة التفصيلية على شاشة القفل.</value>
+  </data>
+  <data name="UI.Settings.AutoDetect" xml:space="preserve">
+    <value>كشف تلقائي</value>
+  </data>
+  <data name="Dialog.LocationAccessDenied" xml:space="preserve">
+    <value>لم يتم السماح بالوصول إلى الموقع.</value>
+  </data>
 </root>

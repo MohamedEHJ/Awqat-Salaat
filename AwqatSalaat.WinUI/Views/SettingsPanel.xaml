@@ -42,7 +42,6 @@
             <converters:ThemeAccentConverter x:Key="ThemeAccentConverter"/>
             <converters:DecimalConverter x:Key="DecimalConverter"/>
             <converters:EnumEqualityConverter x:Key="EnumEqualityConverter"/>
-            <converters:EnumEqualityToVisibilityConverter x:Key="EnumEqualityToVisibilityConverter"/>
             <converters:PercentageConverter x:Key="PercentageConverter"/>
             <converters:NullToIntConverter x:Key="NullToIntConverter"/>
 
@@ -193,7 +192,7 @@
                             </ctrl:SettingsItem>
                             <ctrl:SettingsItem Header="{mk:I18n Key=UI.Settings.Calendar}" Description="{mk:I18n Key=UI.Settings.CalendarDescription}">
                                 <StackPanel Orientation="Horizontal">
-                                    <ComboBox ItemsSource="{mk:Enums Type=dt:CalendarType}" SelectedItem="{Binding Realtime.CalendarType, Mode=TwoWay}" Width="280">
+                                    <ComboBox ItemsSource="{mk:Enums Type=dt:CalendarType}" SelectedItem="{Binding Realtime.CalendarType, Mode=TwoWay}" Width="200">
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
                                                 <ctrl:LocalizedStringPresenter Value="{Binding}" KeyFormat="Data.CalendarType.{0}"/>
@@ -209,6 +208,20 @@
                                                    Maximum="2"
                                                    Margin="8,0,0,0"
                                                    IsEnabled="{x:Bind ViewModel.Realtime.CalendarType, Converter={StaticResource EnumEqualityConverter}, ConverterParameter='Hijri', Mode=OneWay}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ctrl:SettingsItem>
+                            <ctrl:SettingsItem x:Name="lockScreenSetting" Header="{mk:I18n Key=UI.Settings.ShowContentOnLockScreen}" Description="{mk:I18n Key=UI.Settings.ShowContentOnLockScreenDescription}">
+                                <StackPanel>
+                                    <ToggleSwitch IsOn="{x:Bind ViewModel.Realtime.ShowContentOnLockScreen}" OnContent="{mk:I18n Key=UI.Controls.Toggle.On}" OffContent="{mk:I18n Key=UI.Controls.Toggle.Off}"/>
+                                    <StackPanel Orientation="Horizontal" Margin="2,4,0,0">
+                                        <FontIcon Glyph="&#xE7BA;" FontSize="12" Foreground="{ThemeResource TextHighlightBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{mk:I18n Key=UI.Settings.LockScreenDetailedStatusNote}" FontSize="12" Foreground="{ThemeResource TextHighlightBrush}" Margin="4,0,0,0"/>
+                                        <TextBlock Margin="4,0,0,0" FontSize="12">
+                                            <Hyperlink Click="LockScreenHyperlink_Click" ToolTipService.ToolTip="ms-settings:lockscreen">
+                                                <Run Text="{mk:I18n Key=UI.Settings.OpenLockScreenSettings}"/>
+                                            </Hyperlink>
+                                        </TextBlock>
                                     </StackPanel>
                                 </StackPanel>
                             </ctrl:SettingsItem>
@@ -630,7 +643,7 @@
                                 <ctrl:SettingsItem Margin="0" Header="{mk:I18n Key=UI.Settings.LocationByCoordinates}" Description="{mk:I18n Key=UI.Settings.LocationByCoordinatesDescription}" IsEnabled="{x:Bind ViewModel.Locator.DetectByCoordinates, Mode=OneWay}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="170"/>
                                             <ColumnDefinition Width="150"/>
                                             <ColumnDefinition/>
                                         </Grid.ColumnDefinitions>
@@ -645,7 +658,10 @@
                                         <TextBox Text="{x:Bind ViewModel.Realtime.Latitude, Converter={StaticResource DecimalConverter}}" Grid.Column="1"/>
                                         <TextBlock Text="{mk:I18n Key=UI.Settings.Longitude}" Grid.Row="2"/>
                                         <TextBox Text="{x:Bind ViewModel.Realtime.Longitude, Converter={StaticResource DecimalConverter}}" Grid.Column="1" Grid.Row="2"/>
-                                        <Button Content="{mk:I18n Key=UI.Settings.Check}" Command="{x:Bind ViewModel.Locator.Check, Mode=OneWay}" Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                        <StackPanel Orientation="Horizontal" Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                            <Button Content="{mk:I18n Key=UI.Settings.Check}" Command="{x:Bind ViewModel.Locator.Check, Mode=OneWay}"/>
+                                            <Button Content="{mk:I18n Key=UI.Settings.AutoDetect}" Margin="4,0,0,0" Click="DetectLocation_Click"/>
+                                        </StackPanel>
                                         <Grid x:DefaultBindMode="OneWay" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Visibility="{x:Bind ViewModel.Locator.PendingCheck}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition/>
@@ -719,6 +735,38 @@
                                     </ListBox.ItemContainerStyle>
                                 </ListBox>
                             </ctrl:SettingsItem>
+                            <ctrl:SettingsItem Header="{mk:I18n Key=UI.Settings.TaskbarButtonBackground}" Description="{mk:I18n Key=UI.Settings.TaskbarButtonBackgroundDescription}">
+                                <StackPanel Orientation="Horizontal">
+                                    <ComboBox ItemsSource="{mk:Enums Type=cfg:WidgetButtonBackgroundType}" SelectedItem="{Binding Realtime.TaskbarButtonBackgroundType, Mode=TwoWay}" Width="150">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <ctrl:LocalizedStringPresenter Value="{Binding}" KeyFormat="Config.WidgetButtonBackgroundType.{0}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                    <StackPanel Orientation="Horizontal" Visibility="{x:Bind ViewModel.Realtime.TaskbarButtonBackgroundType, Converter={StaticResource EnumEqualityToVisibilityConverter}, ConverterParameter=SolidColor, Mode=OneWay}" Margin="16,0,0,0">
+                                        <TextBlock Text="{mk:I18n Key=UI.Settings.Color}" VerticalAlignment="Center"/>
+                                        <Button Padding="5" Margin="8,0,0,0">
+                                            <Button.Content>
+                                                <Rectangle Fill="{x:Bind ViewModel.Realtime.TaskbarButtonBackgroundSolidColor, Converter={StaticResource ColorHexConverter}, Mode=OneWay}"
+                                                       Width="20" Height="20"
+                                                       RadiusX="2" RadiusY="2"/>
+                                            </Button.Content>
+                                            <Button.Flyout>
+                                                <Flyout ShouldConstrainToRootBounds="False">
+                                                    <ColorPicker IsMoreButtonVisible="True"
+                                                             IsAlphaEnabled="True"
+                                                             IsAlphaSliderVisible="True"
+                                                             IsAlphaTextInputVisible="True"
+                                                             IsColorChannelTextInputVisible="True"
+                                                             IsHexInputVisible="True"
+                                                             Color="{x:Bind ViewModel.Realtime.TaskbarButtonBackgroundSolidColor, Converter={StaticResource ColorHexConverter}}"/>
+                                                </Flyout>
+                                            </Button.Flyout>
+                                        </Button>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ctrl:SettingsItem>
                             <ctrl:SettingsItem Header="{mk:I18n Key=UI.Settings.NotificationIndicatorOpacity}" Description="{mk:I18n Key=UI.Settings.NotificationIndicatorOpacityDescription}">
                                 <Slider Minimum="0" Maximum="1" SmallChange="0.1" LargeChange="0.2" SnapsTo="StepValues" StepFrequency="0.1"
                                         Value="{x:Bind ViewModel.Realtime.NotificationIndicatorOpacity}"
@@ -727,6 +775,9 @@
                             </ctrl:SettingsItem>
                             <ctrl:SettingsItem Header="{mk:I18n Key=UI.Settings.ShowAyah}" Description="{mk:I18n Key=UI.Settings.ShowAyahDescription}">
                                 <ToggleSwitch IsOn="{x:Bind ViewModel.Realtime.ShowAyah}" OnContent="{mk:I18n Key=UI.Controls.Toggle.On}" OffContent="{mk:I18n Key=UI.Controls.Toggle.Off}"/>
+                            </ctrl:SettingsItem>
+                            <ctrl:SettingsItem Header="{mk:I18n Key=UI.Settings.ShowLocation}" Description="{mk:I18n Key=UI.Settings.ShowLocationDescription}">
+                                <ToggleSwitch IsOn="{x:Bind ViewModel.Realtime.ShowLocation}" OnContent="{mk:I18n Key=UI.Controls.Toggle.On}" OffContent="{mk:I18n Key=UI.Controls.Toggle.Off}"/>
                             </ctrl:SettingsItem>
                             <ctrl:SettingsItem Header="{mk:I18n Key=UI.Settings.ShowGregorianDate}" Description="{mk:I18n Key=UI.Settings.ShowGregorianDateDescription}">
                                 <ToggleSwitch IsOn="{x:Bind ViewModel.Realtime.ShowGregorianDate}" OnContent="{mk:I18n Key=UI.Controls.Toggle.On}" OffContent="{mk:I18n Key=UI.Controls.Toggle.Off}"/>

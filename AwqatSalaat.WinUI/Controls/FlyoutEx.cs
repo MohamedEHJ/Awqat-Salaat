@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace AwqatSalaat.WinUI.Controls
 {
-    public class CustomizedFlyout : Flyout
+    public class FlyoutEx : Flyout
     {
         private bool isFirstTime = true;
         private Control flyoutPresenter;
         private Popup popup;
 
-        public CustomizedFlyout()
+        public FlyoutEx()
         {
-            this.Opened += CustomizedFlyout_Opened;
-            this.Opening += CustomizedFlyout_Opening;
+            this.Opened += FlyoutEx_Opened;
+            this.Opening += FlyoutEx_Opening;
             ThemeHelper.ThemeChanged += ThemeHelper_ThemeChanged;
         }
 
@@ -49,7 +49,7 @@ namespace AwqatSalaat.WinUI.Controls
 
                 Task.Delay(100).ContinueWith((task, state) =>
                 {
-                    if (state is CustomizedFlyout flyout)
+                    if (state is FlyoutEx flyout)
                     {
                         flyout.DispatcherQueue.TryEnqueue(() => (flyout.flyoutPresenter.Parent as Popup).IsLightDismissEnabled = true);
                     }
@@ -83,12 +83,12 @@ namespace AwqatSalaat.WinUI.Controls
             return presenter;
         }
 
-        private void CustomizedFlyout_Opening(object sender, object e)
+        private void FlyoutEx_Opening(object sender, object e)
         {
             ThemeHelper_ThemeChanged();
         }
         
-        private void CustomizedFlyout_Opened(object sender, object e)
+        private void FlyoutEx_Opened(object sender, object e)
         {
             if (isFirstTime)
             {

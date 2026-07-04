@@ -269,17 +269,24 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <ToggleButton x:Name="toggle" IsChecked="{x:Bind flyout.IsOpen}" IsThreeState="False" Checked="ToggleButton_Checked" Padding="0" FontSize="12" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
+        <Border Background="{x:Bind ViewModel.WidgetSettings.Realtime.TaskbarButtonBackgroundSolidColor, Converter={StaticResource ColorHexConverter}}"
+                Visibility="{x:Bind ViewModel.WidgetSettings.Realtime.TaskbarButtonBackgroundType, Converter={StaticResource EnumEqualityToVisibilityConverter}, ConverterParameter=SolidColor, Mode=OneWay}"
+                CornerRadius="{ThemeResource ControlCornerRadius}"/>
+        <controls:ToggleButtonEx x:Name="toggle" IsChecked="{x:Bind flyout.IsOpen}" IsThreeState="False" Checked="ToggleButton_Checked" Padding="0" FontSize="12" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" IsTextScaleFactorEnabled="False">
             <Grid x:Name="btngrid">
                 <Grid.ContextFlyout>
-                    <controls:CustomizedMenuFlyout ShouldConstrainToRootBounds="False" SystemBackdrop="{StaticResource DesktopAcrylicSystemBackdrop}">
+                    <controls:MenuFlyoutEx ShouldConstrainToRootBounds="False" SystemBackdrop="{StaticResource DesktopAcrylicSystemBackdrop}">
                         <MenuFlyoutItem Text="{mk:I18n Key=UI.ContextMenu.Reposition}" Command="{x:Bind app:TaskBarManager.RepositionWidget, Mode=OneTime}"/>
-                        <MenuFlyoutItem Text="{mk:I18n Key=UI.ContextMenu.ManualPosition}" Command="{x:Bind app:TaskBarManager.ManuallyPositionWidget}"/>
+                        <MenuFlyoutItem Text="{mk:I18n Key=UI.ContextMenu.ManualPosition}" Command="{x:Bind app:TaskBarManager.ManuallyPositionWidget, Mode=OneTime}"/>
                         <MenuFlyoutSeparator/>
                         <MenuFlyoutItem Text="{mk:I18n Key=UI.ContextMenu.Hide}" Command="{x:Bind app:TaskBarManager.HideWidget, Mode=OneTime}"/>
+                        <MenuFlyoutSeparator Visibility="{x:Bind displayFlyoutSubItem.Visibility, Mode=OneWay}"/>
+                        <MenuFlyoutSubItem x:Name="displayFlyoutSubItem" Text="{mk:I18n Key=UI.ContextMenu.Display}" IsEnabled="{x:Bind ViewModel.WidgetSettings.Settings.IsConfigured}">
+                            <RadioMenuFlyoutItem Text="{mk:I18n Key=UI.ContextMenu.AlwaysPrimary}" GroupName="DisplayGroup" Command="{x:Bind app:TaskBarManager.SetDisplay, Mode=OneTime}" CommandParameter="PRIMARY"/>
+                        </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator/>
                         <MenuFlyoutItem Text="{mk:I18n Key=UI.ContextMenu.Quit}" Command="{x:Bind app:App.Quit, Mode=OneTime}"/>
-                    </controls:CustomizedMenuFlyout>
+                    </controls:MenuFlyoutEx>
                 </Grid.ContextFlyout>
                 <Grid x:Name="notificationIndicator" Opacity="{x:Bind ViewModel.WidgetSettings.Realtime.NotificationIndicatorOpacity}">
                     <Border x:Name="alert" Background="{ThemeResource AccentFillColorDefaultBrush}" CornerRadius="{ThemeResource ControlCornerRadius}" Opacity="0"/>
@@ -297,7 +304,7 @@
                                 <RowDefinition x:Name="row2"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Text="{x:Bind ViewModel.DisplayedTime.Name, FallbackValue=NAME}" HorizontalAlignment="{x:Bind ElementsAlignment}" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="prayerTB" Text="{x:Bind ViewModel.DisplayedTime.Name, FallbackValue=NAME}" HorizontalAlignment="{x:Bind ElementsAlignment}" VerticalAlignment="Center"/>
                             <TextBlock x:Name="timeTB" Text="{x:Bind converters:CustomDateTimeConverter.FormatShortTime(ViewModel.DisplayedTime.Time, ash:LocaleManager.Default.CurrentCulture), FallbackValue=TIME}" HorizontalAlignment="{x:Bind ElementsAlignment}" VerticalAlignment="Center" Grid.Row="1"/>
 
                             <TextBlock x:Name="afterTB" Text="{mk:I18n Key=UI.Summary.After}" HorizontalAlignment="{x:Bind ElementsAlignment}" VerticalAlignment="Center" Grid.Column="2"/>
@@ -307,7 +314,7 @@
                             <TextBlock x:Name="sinceTB" Text="{mk:I18n Key=UI.Summary.Since}" HorizontalAlignment="{x:Bind ElementsAlignment}" VerticalAlignment="Center" Grid.Column="2" Visibility="Collapsed"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="{x:Bind ElementsAlignment}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="2" FlowDirection="LeftToRight">
                                 <TextBlock x:Name="sign" Text="+" Visibility="Collapsed"/>
-                                <TextBlock Text="{x:Bind sys:String.Format(ViewModel.WidgetSettings.CountdownFormat, ViewModel.DisplayedTime.Countdown), FallbackValue=COUNTDOWN}" FlowDirection="{x:Bind timeTB.FlowDirection}"/>
+                                <TextBlock x:Name="countdownTB" Text="{x:Bind sys:String.Format(ViewModel.WidgetSettings.CountdownFormat, ViewModel.DisplayedTime.Countdown), FallbackValue=COUNTDOWN}" FlowDirection="{x:Bind timeTB.FlowDirection}"/>
                             </StackPanel>
                         </Grid>
                     </Grid>
@@ -347,7 +354,7 @@
                 </Grid>
             </Grid>
             <FlyoutBase.AttachedFlyout>
-                <controls:CustomizedFlyout x:Name="flyout" ShouldConstrainToRootBounds="False" SystemBackdrop="{StaticResource DesktopAcrylicSystemBackdrop}" Opened="Flyout_Opened" Closed="Flyout_Closed">
+                <controls:FlyoutEx x:Name="flyout" ShouldConstrainToRootBounds="False" SystemBackdrop="{StaticResource DesktopAcrylicSystemBackdrop}" Opened="Flyout_Opened" Closed="Flyout_Closed">
                     <Flyout.FlyoutPresenterStyle>
                         <Style TargetType="FlyoutPresenter" BasedOn="{StaticResource DefaultFlyoutPresenterStyle}">
                             <Setter Property="Background" Value="Transparent"/>
@@ -365,8 +372,8 @@
                                              ParentFlyout="{x:Bind flyout}"
                                              Visibility="{x:Bind ViewModel.WidgetSettings.IsOpen}"/>
                     </Grid>
-                </controls:CustomizedFlyout>
+                </controls:FlyoutEx>
             </FlyoutBase.AttachedFlyout>
-        </ToggleButton>
+        </controls:ToggleButtonEx>
     </Grid>
 </UserControl>

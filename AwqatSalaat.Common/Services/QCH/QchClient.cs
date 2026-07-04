@@ -15,7 +15,15 @@ namespace AwqatSalaat.Services.QCH
     {
         private const string QchEndpoint = "https://www.qatarch.com/cal";
 
+        // Use a static HttpClient to avoid port-exhaustion problem
+        private static readonly HttpClient _httpClient = new HttpClient();
+
         public bool SupportMonthlyData => false;
+
+        static QchClient()
+        {
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", "Awqat Salaat");
+        }
 
         public async Task<ServiceData> GetDataAsync(IRequest request)
         {
@@ -36,32 +44,27 @@ namespace AwqatSalaat.Services.QCH
 
             try
             {
-                using (var client = new HttpClient())
+                using (var stream = await _httpClient.GetStreamAsync(QchEndpoint).ConfigureAwait(false))
                 {
-                    client.DefaultRequestHeaders.Add("User-Agent", "Awqat Salaat");
+                    var scrapData = await ScrapDataAsync(stream);
 
-                    using (var stream = await client.GetStreamAsync(QchEndpoint).ConfigureAwait(false))
+                    if (scrapData?.PrayData is null)
                     {
-                        var scrapData = await ScrapDataAsync(stream);
-
-                        if (scrapData?.PrayData is null)
-                        {
-                            throw new QchException("No result");
-                        }
-
-                        var cityData = scrapData.PrayData.SingleOrDefault(p => p.CityId == req.CityId);
-
-                        if (cityData is null)
-                        {
-                            throw new QchException("City data not available");
-                        }
-
-                        return new ServiceData
-                        {
-                            Location = new Location { City = city.Name, Country = city.Country },
-                            Times = BuildTimes(cityData, city, scrapData.Date)
-                        };
+                        throw new QchException("No result");
                     }
+
+                    var cityData = scrapData.PrayData.SingleOrDefault(p => p.CityId == req.CityId);
+
+                    if (cityData is null)
+                    {
+                        throw new QchException("City data not available");
+                    }
+
+                    return new ServiceData
+                    {
+                        Location = new Location { City = city.Name, Country = city.Country },
+                        Times = BuildTimes(cityData, city, scrapData.Date)
+                    };
                 }
             }
             catch (HttpRequestException hre)

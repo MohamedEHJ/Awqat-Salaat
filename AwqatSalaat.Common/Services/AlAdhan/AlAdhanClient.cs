@@ -11,6 +11,14 @@ namespace AwqatSalaat.Services.AlAdhan
     {
         public bool SupportMonthlyData => true;
 
+        // Use a static HttpClient to avoid port-exhaustion problem
+        private static readonly HttpClient _httpClient = new HttpClient();
+
+        static AlAdhanClient()
+        {
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", "Awqat Salaat");
+        }
+
         public async Task<ServiceData> GetDataAsync(IRequest request)
         {
             var req = (AlAdhanRequest)request;
@@ -36,31 +44,28 @@ namespace AwqatSalaat.Services.AlAdhan
         {
             try
             {
-                using (HttpClient client = new HttpClient())
-                {
-                    var url = request.GetUrl();
-                    Log.Debug($"[Al-Adhan] Getting data from: {url}");
-                    var httpResponse = await client.GetAsync(url);
-                    Log.Debug($"[Al-Adhan] Response status code: {httpResponse.StatusCode}");
+                var url = request.GetUrl();
+                Log.Debug($"[Al-Adhan] Getting data from: {url}");
+                var httpResponse = await _httpClient.GetAsync(url);
+                Log.Debug($"[Al-Adhan] Response status code: {httpResponse.StatusCode}");
 
-                    if (httpResponse.IsSuccessStatusCode)
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    string responseBody = await httpResponse.Content.ReadAsStringAsync();
+                    T apiResponse = JsonConvert.DeserializeObject<T>(responseBody);
+                    return apiResponse;
+                }
+                else
+                {
+                    try
                     {
                         string responseBody = await httpResponse.Content.ReadAsStringAsync();
-                        T apiResponse = JsonConvert.DeserializeObject<T>(responseBody);
-                        return apiResponse;
+                        ErrorResponse apiResponse = JsonConvert.DeserializeObject<ErrorResponse>(responseBody);
+                        throw new AlAdhanApiException(apiResponse.Data);
                     }
-                    else
+                    catch (Exception ex) when (!(ex is AlAdhanApiException))
                     {
-                        try
-                        {
-                            string responseBody = await httpResponse.Content.ReadAsStringAsync();
-                            ErrorResponse apiResponse = JsonConvert.DeserializeObject<ErrorResponse>(responseBody);
-                            throw new AlAdhanApiException(apiResponse.Data);
-                        }
-                        catch (Exception ex) when (!(ex is AlAdhanApiException))
-                        {
-                            throw new AlAdhanApiException($"Something went wrong: {httpResponse.ReasonPhrase} (StatusCode={httpResponse.StatusCode})");
-                        }
+                        throw new AlAdhanApiException($"Something went wrong: {httpResponse.ReasonPhrase} (StatusCode={httpResponse.StatusCode})");
                     }
                 }
             }

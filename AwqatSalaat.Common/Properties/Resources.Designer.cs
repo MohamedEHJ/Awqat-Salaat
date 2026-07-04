@@ -205,6 +205,24 @@ namespace AwqatSalaat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to None.
+        /// </summary>
+        public static string Config_WidgetButtonBackgroundType_None {
+            get {
+                return ResourceManager.GetString("Config.WidgetButtonBackgroundType.None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Solid Color.
+        /// </summary>
+        public static string Config_WidgetButtonBackgroundType_SolidColor {
+            get {
+                return ResourceManager.GetString("Config.WidgetButtonBackgroundType.SolidColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Alternative.
         /// </summary>
         public static string Config_WidgetPanelStyle_Alt {
@@ -476,6 +494,15 @@ namespace AwqatSalaat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not allowed to access location..
+        /// </summary>
+        public static string Dialog_LocationAccessDenied {
+            get {
+                return ResourceManager.GetString("Dialog.LocationAccessDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The logs file does not exist. It may not be created yet..
         /// </summary>
         public static string Dialog_LogsFileNotFound {
@@ -569,6 +596,24 @@ namespace AwqatSalaat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Okay, I will prepare to pray.
+        /// </summary>
+        public static string Notification_DismissReminder {
+            get {
+                return ResourceManager.GetString("Notification.DismissReminder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Okay, I will pray.
+        /// </summary>
+        public static string Notification_DismissTimeEntered {
+            get {
+                return ResourceManager.GetString("Notification.DismissTimeEntered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} time has entered now.
         /// </summary>
         public static string Notification_PrayerTimeEnteredFormat {
@@ -592,6 +637,15 @@ namespace AwqatSalaat.Properties {
         public static string Notification_StopSound {
             get {
                 return ResourceManager.GetString("Notification.StopSound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The widget is still running. Use system tray icon to show it again..
+        /// </summary>
+        public static string Notification_WidgetStillRunning {
+            get {
+                return ResourceManager.GetString("Notification.WidgetStillRunning", resourceCulture);
             }
         }
         
@@ -728,6 +782,24 @@ namespace AwqatSalaat.Properties {
         public static string UI_Calendar_Title {
             get {
                 return ResourceManager.GetString("UI.Calendar.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Always Primary.
+        /// </summary>
+        public static string UI_ContextMenu_AlwaysPrimary {
+            get {
+                return ResourceManager.GetString("UI.ContextMenu.AlwaysPrimary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Display.
+        /// </summary>
+        public static string UI_ContextMenu_Display {
+            get {
+                return ResourceManager.GetString("UI.ContextMenu.Display", resourceCulture);
             }
         }
         
@@ -985,6 +1057,15 @@ namespace AwqatSalaat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Auto detect.
+        /// </summary>
+        public static string UI_Settings_AutoDetect {
+            get {
+                return ResourceManager.GetString("UI.Settings.AutoDetect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Browse....
         /// </summary>
         public static string UI_Settings_Browse {
@@ -1053,6 +1134,15 @@ namespace AwqatSalaat.Properties {
         public static string UI_Settings_CityDescription {
             get {
                 return ResourceManager.GetString("UI.Settings.CityDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Color.
+        /// </summary>
+        public static string UI_Settings_Color {
+            get {
+                return ResourceManager.GetString("UI.Settings.Color", resourceCulture);
             }
         }
         
@@ -1462,6 +1552,15 @@ namespace AwqatSalaat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must choose this app as the one to show detailed status on the lock screen..
+        /// </summary>
+        public static string UI_Settings_LockScreenDetailedStatusNote {
+            get {
+                return ResourceManager.GetString("UI.Settings.LockScreenDetailedStatusNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Longitude.
         /// </summary>
         public static string UI_Settings_Longitude {
@@ -1557,6 +1656,15 @@ namespace AwqatSalaat.Properties {
         public static string UI_Settings_NotificationSoundDescription {
             get {
                 return ResourceManager.GetString("UI.Settings.NotificationSoundDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open lock screen settings.
+        /// </summary>
+        public static string UI_Settings_OpenLockScreenSettings {
+            get {
+                return ResourceManager.GetString("UI.Settings.OpenLockScreenSettings", resourceCulture);
             }
         }
         
@@ -1714,6 +1822,24 @@ namespace AwqatSalaat.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show content on the lock screen.
+        /// </summary>
+        public static string UI_Settings_ShowContentOnLockScreen {
+            get {
+                return ResourceManager.GetString("UI.Settings.ShowContentOnLockScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Allow the widget to show prayer time and countdown on the lock screen.
+        /// </summary>
+        public static string UI_Settings_ShowContentOnLockScreenDescription {
+            get {
+                return ResourceManager.GetString("UI.Settings.ShowContentOnLockScreenDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show countdown.
         /// </summary>
         public static string UI_Settings_ShowCountdown {
@@ -1746,6 +1872,24 @@ namespace AwqatSalaat.Properties {
         public static string UI_Settings_ShowGregorianDateDescription {
             get {
                 return ResourceManager.GetString("UI.Settings.ShowGregorianDateDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show location.
+        /// </summary>
+        public static string UI_Settings_ShowLocation {
+            get {
+                return ResourceManager.GetString("UI.Settings.ShowLocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable or disable the visibility of the location in prayers panel.
+        /// </summary>
+        public static string UI_Settings_ShowLocationDescription {
+            get {
+                return ResourceManager.GetString("UI.Settings.ShowLocationDescription", resourceCulture);
             }
         }
         
@@ -1827,6 +1971,24 @@ namespace AwqatSalaat.Properties {
         public static string UI_Settings_Tabs_Times {
             get {
                 return ResourceManager.GetString("UI.Settings.Tabs.Times", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Taskbar button background.
+        /// </summary>
+        public static string UI_Settings_TaskbarButtonBackground {
+            get {
+                return ResourceManager.GetString("UI.Settings.TaskbarButtonBackground", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The background of the widget&apos;s button on the taskbar.
+        /// </summary>
+        public static string UI_Settings_TaskbarButtonBackgroundDescription {
+            get {
+                return ResourceManager.GetString("UI.Settings.TaskbarButtonBackgroundDescription", resourceCulture);
             }
         }
         

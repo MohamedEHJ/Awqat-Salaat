@@ -42,6 +42,8 @@
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:BooleanToVisibilityInvertedConverter x:Key="BooleanToVisibilityInvertedConverter"/>
             <converters:BooleanInvertedConverter x:Key="BooleanInvertedConverter"/>
+            <converters:EnumEqualityToVisibilityConverter x:Key="EnumEqualityToVisibilityConverter"/>
+            <converters:ColorHexConverter x:Key="ColorHexConverter"/>
 
             <!-- Should be removed after upgrading WASDK version since the issue is fixed in v1.6 -->
             <Style TargetType="NumberBox">

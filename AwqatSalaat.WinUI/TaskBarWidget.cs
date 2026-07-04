@@ -1,6 +1,7 @@
 ﻿using AwqatSalaat.Helpers;
 using AwqatSalaat.Interop;
 using AwqatSalaat.WinUI.Controls;
+using AwqatSalaat.WinUI.Helpers;
 using AwqatSalaat.WinUI.Views;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
@@ -9,6 +10,7 @@ using Microsoft.UI.Xaml.Input;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,14 +20,12 @@ namespace AwqatSalaat.WinUI
 {
     internal class TaskBarWidget : IDisposable
     {
-        private const string TaskBarClassName = "Shell_TrayWnd";
-        private const string ReBarWindow32ClassName = "ReBarWindow32";
-        private const string NotificationAreaClassName = "TrayNotifyWnd";
         private const string WidgetsButtonAutomationId = "WidgetsButton";
         private const int DefaultWidgetHostWidth = 126; // 118 for the button (2 for borders) + 4 for left margin + 4 for right margin
         private const int CompactWidgetHostWidth = 70; // 62 for the button (2 for borders) + 4 for left margin + 4 for right margin
 
         private static readonly bool IsRtlUI = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+        private static readonly string SecondaryClockClassName = SystemInfos.IsWindows10 ? "ClockButton" : "SystemTray.OmniButton";
 
         private readonly double dpiScale;
 
@@ -33,6 +33,7 @@ namespace AwqatSalaat.WinUI
         private readonly IntPtr hwndTrayNotify;
         private readonly IntPtr hwndReBar;
         private readonly string WidgetClassName = "AwqatSalaatWidgetWinRT";
+        private readonly string displayPath;
 
         private readonly TaskbarStructureWatcher taskbarWatcher;
 
@@ -52,19 +53,18 @@ namespace AwqatSalaat.WinUI
         private bool disposedValue;
 
         public IntPtr Handle => hwnd != IntPtr.Zero ? hwnd : throw new InvalidOperationException("The widget is not initialized.");
+        public DisplayEntity Display => DisplayHelper.AvailableDisplays.SingleOrDefault(d => d.Display.DevicePath == displayPath);
 
         public event EventHandler Destroying;
 
-        public TaskBarWidget()
+        public TaskBarWidget(DisplayEntity display)
         {
-            hwndShell = User32.FindWindow(TaskBarClassName, null);
-            hwndTrayNotify = User32.FindWindowEx(hwndShell, IntPtr.Zero, NotificationAreaClassName , null);
-            hwndReBar = User32.FindWindowEx(hwndShell, IntPtr.Zero, ReBarWindow32ClassName , null);
+            displayPath = display.Display.DevicePath;
+            (hwndShell, hwndReBar, hwndTrayNotify) = DisplayHelper.GetTaskbarFromDisplay(display);
 
-            var dpi = User32.GetDpiForWindow(hwndShell);
-            dpiScale = dpi / 96d;
+            dpiScale = display.Dpi / 96d;
             WidgetHostWidth = (int)Math.Ceiling(dpiScale * DefaultWidgetHostWidth);
-            Log.Debug($"Widget constructor: DPI={dpi}, Width={WidgetHostWidth}, Taskbar RTL={IsRtlUI}");
+            Log.Debug($"Widget constructor: Display={display.Display.DevicePath}, DPI={display.Dpi}, Width={WidgetHostWidth}, Taskbar RTL={IsRtlUI}");
 
             taskbarWatcher = new TaskbarStructureWatcher(hwndShell, hwndReBar);
             taskbarWatcher.TaskbarChangedNotificationStarted += TaskbarWatcher_TaskbarChangedNotificationStarted;
@@ -92,7 +92,7 @@ namespace AwqatSalaat.WinUI
             appWindow.IsShownInSwitchers = false;
             appWindow.Destroying += AppWindow_Destroying;
 
-            var taskbarRect = SystemInfos.GetTaskBarBounds();
+            User32.GetWindowRect(hwndShell, out RECT taskbarRect);
             appWindow.ResizeClient(new SizeInt32(WidgetHostWidth, taskbarRect.bottom - taskbarRect.top));
             Log.Debug("Taskbar rect: {@rect}", taskbarRect);
 
@@ -116,7 +116,7 @@ namespace AwqatSalaat.WinUI
 
         private void TaskbarWatcher_TaskbarChangedNotificationStarted(object sender, TaskbarChangedEventArgs e)
         {
-            if (e.IsTaskbarHidden || !initialized)
+            if (e.IsTaskbarHidden || !initialized || destroyed)
             {
                 e.Canceled = true;
                 return;
@@ -127,7 +127,7 @@ namespace AwqatSalaat.WinUI
             // -1 means the user didn't set manual position
             if (savedOffsetX == -1 && e.Reason == TaskbarChangeReason.Alignment)
             {
-                Log.Debug("Exciting an animation (hide) due to taskbar alignment change");
+                Log.Debug("Triggering an animation (hide) due to taskbar alignment change");
                 // This only to make the widget show an animation :)
                 widgetSummary.DispatcherQueue.TryEnqueue(() => (host.Content as GridEx).Children.Clear());
             }
@@ -139,7 +139,7 @@ namespace AwqatSalaat.WinUI
 
         private void TaskbarWatcher_TaskbarChangedNotificationCompleted(object sender, TaskbarChangedEventArgs e)
         {
-            if (initialized)
+            if (initialized && !destroyed)
             {
                 UpdatePositionImpl(e.Reason, e.IsTaskbarCentered, e.IsTaskbarWidgetsEnabled);
             }
@@ -241,37 +241,49 @@ namespace AwqatSalaat.WinUI
             Log.Information($"Updating widget position. Reason={changeReason}, Taskbar centered={isCentered}, Widgets enabled={isWidgetsEnabled}");
             int offsetX = Properties.Settings.Default.CustomPosition;
 
-            User32.GetWindowRect(hwndShell, out RECT taskbarRect);
-            Log.Debug("Current taskbar rect: {@rect}", taskbarRect);
+            RECT taskbarRect = GetTaskbarRect();
 
             // -1 means the user didn't set manual position, so we have to find the best one
             if (offsetX == -1)
             {
                 Log.Debug("Updating position in auto mode");
                 var widgetsButton = isWidgetsEnabled ? await taskbarWatcher.GetAutomationElementAsync(WidgetsButtonAutomationId) : null;
-                var widgetsButtonBoundingRectangle = widgetsButton?.CurrentBoundingRectangle;
-                User32.GetWindowRect(hwndTrayNotify, out RECT trayNotifyRect);
-                Log.Debug("System tray rect: {@trayRect}", trayNotifyRect);
-                Log.Debug("Widgets button rect: {@widgetsButtonRect}", widgetsButtonBoundingRectangle);
+                var widgetsButtonRect = widgetsButton?.CurrentBoundingRectangle;
+
+                // convert to local coords
+                if (widgetsButtonRect.HasValue)
+                {
+                    var displayPosition = Display.CachedSettings.Position;
+                    var wbRect = widgetsButtonRect.Value;
+                    wbRect.left -= displayPosition.X;
+                    wbRect.right -= displayPosition.X;
+                    wbRect.top -= displayPosition.Y;
+                    wbRect.bottom -= displayPosition.Y;
+                    widgetsButtonRect = wbRect;
+                }
+
+                RECT trayNotifyRect = await GetTrayAreaRectAsync();
+
+                Log.Debug("Widgets button rect: {@widgetsButtonRect}", widgetsButtonRect);
 
                 if (isCentered)
                 {
                     if (IsRtlUI)
                     {
-                        offsetX = (widgetsButtonBoundingRectangle?.left ?? taskbarRect.right) - WidgetHostWidth;
+                        offsetX = (widgetsButtonRect?.left ?? taskbarRect.right) - WidgetHostWidth;
                     }
                     else
                     {
-                        offsetX = widgetsButtonBoundingRectangle?.right ?? 0;
+                        offsetX = widgetsButtonRect?.right ?? 0;
                     }
                 }
                 else
                 {
                     if (IsRtlUI)
                     {
-                        if (widgetsButton is not null && (widgetsButtonBoundingRectangle.Value.left - trayNotifyRect.right) < WidgetHostWidth)
+                        if (widgetsButton is not null && (widgetsButtonRect.Value.left - trayNotifyRect.right) < WidgetHostWidth)
                         {
-                            offsetX = widgetsButtonBoundingRectangle.Value.right;
+                            offsetX = widgetsButtonRect.Value.right;
                         }
                         else
                         {
@@ -280,9 +292,9 @@ namespace AwqatSalaat.WinUI
                     }
                     else
                     {
-                        if (widgetsButton is not null && (trayNotifyRect.left - widgetsButtonBoundingRectangle.Value.right) < WidgetHostWidth)
+                        if (widgetsButton is not null && (trayNotifyRect.left - widgetsButtonRect.Value.right) < WidgetHostWidth)
                         {
-                            offsetX = widgetsButtonBoundingRectangle.Value.left - WidgetHostWidth;
+                            offsetX = widgetsButtonRect.Value.left - WidgetHostWidth;
                         }
                         else
                         {
@@ -367,10 +379,51 @@ namespace AwqatSalaat.WinUI
 
                 if (changeReason == TaskbarChangeReason.Alignment || grid.Children.Count == 0)
                 {
-                    Log.Debug("Exciting an animation (show) due to taskbar alignment change");
+                    Log.Debug("Triggering an animation (show) due to taskbar alignment change");
                     grid.Children.Add(widgetSummary);
                 }
             });
+        }
+
+        private RECT GetTaskbarRect()
+        {
+            User32.GetWindowRect(hwndShell, out RECT taskbarRect);
+            Log.Debug("Current taskbar rect: {@rect}", taskbarRect);
+
+            // convert to local coords
+            var displaySettings = Display.CachedSettings;
+            taskbarRect.left -= displaySettings.Position.X;
+            taskbarRect.right -= displaySettings.Position.X;
+            taskbarRect.top -= displaySettings.Position.Y;
+            taskbarRect.bottom -= displaySettings.Position.Y;
+
+            return taskbarRect;
+        }
+
+        private async Task<RECT> GetTrayAreaRectAsync()
+        {
+            User32.GetWindowRect(hwndTrayNotify, out RECT trayNotifyRect);
+
+            // In secondary displays there is no tray area, so we set the values of system clock
+            if (hwndTrayNotify == IntPtr.Zero)
+            {
+                Log.Debug("There is no system tray area, use clock element instead");
+                var clockElement = await taskbarWatcher.GetAutomationElementByClassNameAsync(SecondaryClockClassName);
+                var displayPosX = Display.CachedSettings.Position.X;
+
+                if (IsRtlUI)
+                {
+                    trayNotifyRect.right = clockElement.CurrentBoundingRectangle.right - displayPosX;
+                }
+                else
+                {
+                    trayNotifyRect.left = clockElement.CurrentBoundingRectangle.left - displayPosX;
+                }
+            }
+            
+            Log.Debug("System tray rect: {@trayRect}", trayNotifyRect);
+
+            return trayNotifyRect;
         }
 
         public void StartDragging()
@@ -414,13 +467,14 @@ namespace AwqatSalaat.WinUI
                 }
                 else
                 {
-                    Log.Information($"New offset={appWindow.Position.X}; Old position={currentOffsetX}");
-                    currentOffsetX = appWindow.Position.X;
+                    int newX = appWindow.Position.X - Display.CachedSettings.Position.X;
+                    Log.Information($"New offset={newX}; Old position={currentOffsetX}");
+                    currentOffsetX = newX;
                     Properties.Settings.Default.CustomPosition = currentOffsetX;
 
                     if (Properties.Settings.Default.IsConfigured)
                     {
-                        Properties.Settings.Default.Save(); 
+                        Properties.Settings.Default.Save();
                     }
                 }
             }
@@ -446,15 +500,25 @@ namespace AwqatSalaat.WinUI
             host.Content.PointerMoved += Content_PointerMoved;
             host.Content.CapturePointer(e.Pointer);
             User32.GetCursorPos(out var lpPoint);
-            lastCursorPositionX = lpPoint.x;
+            // The order is VERY IMPORTANT!
             draggingInnerOffsetX = lpPoint.x - appWindow.Position.X;
+            lpPoint.x -= Display.CachedSettings.Position.X;
+            lastCursorPositionX = lpPoint.x;
         }
 
-        private void Content_PointerMoved(object sender, PointerRoutedEventArgs e)
+        private async void Content_PointerMoved(object sender, PointerRoutedEventArgs e)
         {
-            User32.GetWindowRect(hwndShell, out RECT taskbarRect);
-            User32.GetWindowRect(hwndTrayNotify, out RECT trayNotifyRect);
+            RECT taskbarRect = GetTaskbarRect();
+            RECT trayNotifyRect = await GetTrayAreaRectAsync();
+
+            if (!isDragging)
+            {
+                return;
+            }
+
+            var displayPosX = Display.CachedSettings.Position.X;
             User32.GetCursorPos(out var lpPoint);
+            lpPoint.x -= displayPosX;
 
             int minCursorX, maxCursorX;
 
@@ -472,7 +536,7 @@ namespace AwqatSalaat.WinUI
             lpPoint.x = Math.Clamp(lpPoint.x, minCursorX, maxCursorX);
 
             int delta = lpPoint.x - lastCursorPositionX;
-            int newX = delta + appWindow.Position.X;
+            int newX = delta + appWindow.Position.X - displayPosX;
 
             appWindow.Move(new PointInt32(newX, currentOffsetY));
             lastCursorPositionX = lpPoint.x;
@@ -488,7 +552,7 @@ namespace AwqatSalaat.WinUI
             {
                 User32.GetWindowRect(hwndShell, out RECT taskbarRect);
                 int taskbarWidth = taskbarRect.right - taskbarRect.left;
-                int widgetMiddleX = appWindow.Position.X + appWindow.Size.Width / 2;
+                int widgetMiddleX = appWindow.Position.X + appWindow.Size.Width / 2 - Display.CachedSettings.Position.X;
                 float resolution = 0.15f;
                 bool condition = IsRtlUI ? widgetMiddleX >= taskbarWidth * (1 - resolution) : widgetMiddleX <= taskbarWidth * resolution;
 
@@ -518,12 +582,14 @@ namespace AwqatSalaat.WinUI
         {
             RegisterWindowClass();
 
+            var displayPosition = Display.CachedSettings.Position;
+
             var hwnd = User32.CreateWindowEx(
                 dwExStyle: WindowStylesExtended.WS_EX_LAYERED,
                 lpClassName: WidgetClassName,
                 lpWindowName: "WidgetHost",
                 dwStyle: WindowStyles.WS_POPUP,
-                x: 0, y: 0,
+                x: displayPosition.X, y: displayPosition.Y,
                 nWidth: 0, nHeight: 0,
                 hWndParent: parent,
                 hMenu: IntPtr.Zero,
@@ -580,6 +646,7 @@ namespace AwqatSalaat.WinUI
                     or "TrayDummySearchControl"
                     or "ReBarWindow32"
                     or "TrayNotifyWnd"
+                    or "WorkerW"
                     // Windows 10 only
                     or "TrayButton"
                     or "DynamicContent2"

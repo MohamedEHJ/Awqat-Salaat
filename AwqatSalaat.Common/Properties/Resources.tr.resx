@@ -533,4 +533,7 @@ Takvimi seçin, yıl ve ayı girin, ardından güncelle'ye tıklayın</value>
   <data name="Dialog.LogsFileNotFound" xml:space="preserve">
     <value>Log dosyası bulunamadı. Henüz oluşturulmamış olabilir.</value>
   </data>
+  <data name="Notification.Dismiss" xml:space="preserve">
+    <value>Yoksay</value>
+  </data>
 </root>

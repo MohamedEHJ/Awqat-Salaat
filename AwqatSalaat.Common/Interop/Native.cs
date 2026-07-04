@@ -21,6 +21,9 @@ namespace AwqatSalaat.Interop
         public static extern uint GetDpiForWindow([In] IntPtr hWnd);
 
         [DllImport("user32.dll")]
+        public static extern IntPtr MonitorFromPoint([In] POINT pt, [In] MonitorFrom_Flags dwFlags);
+
+        [DllImport("user32.dll")]
         public static extern bool GetWindowRect([In] IntPtr hWnd, [Out] out RECT lpRect);
 
         [DllImport("user32.dll")]
@@ -128,6 +131,12 @@ namespace AwqatSalaat.Interop
         public static extern UIntPtr SHAppBarMessage([In] AppBarMessage msg, [In, Out] ref APPBARDATA data);
     }
 
+    public static class Shcore
+    {
+        [DllImport("shcore.dll")]
+        public static extern IntPtr GetDpiForMonitor([In] IntPtr hmonitor, [In] MonitorDpiType dpiType, [Out] out uint dpiX, [Out] out uint dpiY);
+    }
+
     public static class Kernel32
     {
         [DllImport("kernel32.dll")]
@@ -135,6 +144,21 @@ namespace AwqatSalaat.Interop
 
         [DllImport("kernel32.dll")]
         public static extern IntPtr RegisterApplicationRestart(string pwzCommandline, ApplicationRestart dwFlags = ApplicationRestart.None);
+    }
+
+    public enum MonitorFrom_Flags : uint
+    {
+        MONITOR_DEFAULTTONULL = 0,
+        MONITOR_DEFAULTTOPRIMARY = 1,
+        MONITOR_DEFAULTTONEAREST = 2,
+    }
+
+    public enum MonitorDpiType : uint
+    {
+        MDT_EFFECTIVE_DPI = 0,
+        MDT_ANGULAR_DPI = 1,
+        MDT_RAW_DPI = 2,
+        MDT_DEFAULT = 0
     }
 
     [Flags]

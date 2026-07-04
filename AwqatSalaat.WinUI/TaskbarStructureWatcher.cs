@@ -4,8 +4,6 @@ using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Serilog;
 using System;
-using System.Management;
-using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using UIAutomationClient;
@@ -68,6 +66,7 @@ namespace AwqatSalaat.WinUI
         private const int UIA_BoundingRectanglePropertyId = 30001;
         private const int UIA_NamePropertyId = 30005;
         private const int UIA_AutomationIdPropertyId = 30011;
+        private const int UIA_ClassNamePropertyId = 30012;
 
         private static readonly IUIAutomation pUIAutomation = new CUIAutomation();
 
@@ -81,7 +80,6 @@ namespace AwqatSalaat.WinUI
         private bool taskbarCentered;
         private bool taskbarHidden;
         private CancellationTokenSource updateCancellation;
-        private ManagementEventWatcher watcher;
         private UpdateContext updateContext;
 
         // Notify listeners about a change happened in the taskbar
@@ -106,8 +104,8 @@ namespace AwqatSalaat.WinUI
 
             Log.Information($"Creating taskbar watcher. Taskbar hidden={taskbarHidden}, Taskbar centered={taskbarCentered}, Gap={rebarGap}, Widgets enabled={widgetsButtonEnabled}");
 
-            RegisterEventHandlers();
-            CreateRegistryWatcher();
+            //RegisterEventHandlers();
+            Task.Run(RegisterEventHandlers);
         }
 
         private int GetReBarGap()
@@ -136,14 +134,19 @@ namespace AwqatSalaat.WinUI
 
         public Task<IUIAutomationElement> GetAutomationElementAsync(string automationId)
         {
-            return Task.Run(() => GetAutomationElement(automationId));
+            return Task.Run(() => GetAutomationElement(UIA_AutomationIdPropertyId, automationId));
         }
 
-        private IUIAutomationElement GetAutomationElement(string automationId)
+        public Task<IUIAutomationElement> GetAutomationElementByClassNameAsync(string className)
+        {
+            return Task.Run(() => GetAutomationElement(UIA_ClassNamePropertyId, className));
+        }
+
+        private IUIAutomationElement GetAutomationElement(int propertyId, object value)
         {
             if (taskbarElement is not null)
             {
-                IUIAutomationCondition condition = pUIAutomation.CreatePropertyCondition(UIA_AutomationIdPropertyId, automationId);
+                IUIAutomationCondition condition = pUIAutomation.CreatePropertyCondition(propertyId, value);
                 return taskbarElement.FindFirst(TreeScope.TreeScope_Descendants | TreeScope.TreeScope_Children, condition);
             }
 
@@ -276,6 +279,8 @@ namespace AwqatSalaat.WinUI
                 cacheReq.AddProperty(UIA_NamePropertyId);
                 pUIAutomation.AddStructureChangedEventHandler(taskbarElement, TreeScope.TreeScope_Subtree, cacheReq, this);
                 pUIAutomation.AddPropertyChangedEventHandler(taskbarElement, TreeScope.TreeScope_Children, cacheReq, this, new int[] { UIA_BoundingRectanglePropertyId });
+
+                TaskbarSettingsWatcher.SettingChanged += TaskbarSettingsWatcher_TaskbarSettingChanged;
             }
         }
 
@@ -283,40 +288,27 @@ namespace AwqatSalaat.WinUI
         {
             Log.Information("Unregistering event handlers in taskbar watcher");
 
+            TaskbarSettingsWatcher.SettingChanged -= TaskbarSettingsWatcher_TaskbarSettingChanged;
+
             if (taskbarElement is not null)
             {
                 pUIAutomation.RemoveAllEventHandlers();
             }
         }
 
-        private void CreateRegistryWatcher()
+        private void TaskbarSettingsWatcher_TaskbarSettingChanged(object sender, TaskbarSettingChangedEventArgs e)
         {
-            Log.Information("Creating registry watcher");
-            var currentUser = WindowsIdentity.GetCurrent();
-
-            WqlEventQuery query = new WqlEventQuery(
-                "SELECT * FROM RegistryKeyChangeEvent WHERE " +
-                 "Hive = 'HKEY_USERS' " +
-                 @"AND KeyPath = '" + currentUser.User.Value + @"\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced'");
-
-            query.WithinInterval = new TimeSpan(0, 0, 0, 1);
-
-            watcher = new ManagementEventWatcher(query);
-            watcher.EventArrived += new EventArrivedEventHandler(RegistryKeyChanged);
-            watcher.Start();
-        }
-
-        private void RegistryKeyChanged(object sender, EventArrivedEventArgs e)
-        {
-            bool isWidgetsButtonEnabled = SystemInfos.IsTaskBarWidgetsEnabled();
-            bool isTaskbarCentered = SystemInfos.IsTaskBarCentered();
-
             // We are only interested in registry notifications for widgets button change when taskbar is left-aligned
-            if ((isWidgetsButtonEnabled != widgetsButtonEnabled) && !isTaskbarCentered)
+            if (e.Setting == TaskbarSetting.WidgetsButton)
             {
-                Log.Information("Detected registry change for Widgets button");
-                widgetsButtonEnabled = isWidgetsButtonEnabled;
-                RaiseNotification(TaskbarChangeReason.WidgetsButton);
+                bool isTaskbarCentered = SystemInfos.IsTaskBarCentered();
+
+                if (!isTaskbarCentered)
+                {
+                    Log.Information("Detected registry change for Widgets button");
+                    widgetsButtonEnabled = SystemInfos.IsTaskBarWidgetsEnabled();
+                    RaiseNotification(TaskbarChangeReason.WidgetsButton);
+                }
             }
         }
 
@@ -324,7 +316,6 @@ namespace AwqatSalaat.WinUI
         {
             Log.Information("Disposing taskbar watcher");
             Task.Run(UnregisterEventHandlers);
-            watcher?.Dispose();
         }
     }
 

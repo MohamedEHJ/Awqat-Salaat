@@ -34,7 +34,7 @@
                 <TextBlock Text="{x:Bind ViewModel.DisplayedDate.ToString('dd MMMM yyyy', ash:LocaleManager.Default.CurrentCulture)}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" Margin="0,0,0,0"/>
             </StackPanel>
         </StackPanel>
-        <controls:StackPanelEx Orientation="Horizontal" MaxWidth="200" Margin="0,4" HorizontalAlignment="Center" Grid.Row="1" FlowDirection="LeftToRight">
+        <controls:StackPanelEx Orientation="Horizontal" MaxWidth="200" Margin="0,4" HorizontalAlignment="Center" Grid.Row="1" FlowDirection="LeftToRight" Visibility="{x:Bind ViewModel.WidgetSettings.Settings.ShowLocation}">
             <TextBlock Text="{x:Bind ViewModel.City}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center"/>
             <Rectangle Height="1" Width="8" Fill="{ThemeResource ControlElevationBorderBrush}" Margin="8,5,8,3"/>
             <TextBlock Text="{x:Bind ViewModel.Country}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center"/>

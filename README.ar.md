@@ -181,6 +181,7 @@
 - [مكتبة Adhan-csharp:](https://github.com/davidpet86/Adhan-csharp) توفر ترجمة بلغة C# لمكتبة [Adhan](https://github.com/batoulapps/Adhan) التي توفر خدمة حساب وقت الصلاة بدقة عالية.
 - [خدمة Nominatim:](https://nominatim.org/) خدمة ترميز جغرافي مفتوحة المصدر.
 - [مكتبة CsvHelper:](https://github.com/JoshClose/CsvHelper) مكتبة تساعد على قراءة وكتابة ملفات CSV.
+- [مكتبة WindowsDisplayAPI:](https://github.com/falahati/WindowsDisplayAPI) غلاف .NET لواجهات برمجة تطبيقات Windows Display وWindows CCD.
 
 ## اتصال
 

@@ -12,7 +12,7 @@
     <Identity
         Name="Khiro.AwqatSalaatWinUI"
         Publisher="CN=C005A407-3926-439C-B560-3187F3293A86"
-        Version="4.1.2.0" />
+        Version="4.2.3.0" />
 
     <Properties>
         <DisplayName>ms-resource:AppDisplayName</DisplayName>
@@ -61,7 +61,8 @@
                 BackgroundColor="transparent"
                 Square150x150Logo="Images\MedTile.png"
                 Square44x44Logo="Images\AppList.png">
-                <uap:DefaultTile Square71x71Logo="Images\SmallTile.png"/>
+                <uap:DefaultTile Square71x71Logo="Images\SmallTile.png"  Wide310x150Logo="Images\WideTile.png"/>
+                <uap:LockScreen BadgeLogo="Images\Badge.png" Notification="badgeAndTileText"/>
             </uap:VisualElements>
         </Application>
     </Applications>

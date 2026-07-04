@@ -106,6 +106,8 @@
   <ItemGroup>
     <Content Include="Images\SmallTile.scale-200.png" />
     <Content Include="Images\MedTile.scale-200.png" />
+    <Content Include="Images\WideTile.scale-200.png" />
+    <Content Include="Images\Badge.scale-200.png" />
     <Content Include="Images\AppList.scale-200.png" />
     <Content Include="Images\AppList.targetsize-16.png" />
     <Content Include="Images\AppList.targetsize-20.png" />

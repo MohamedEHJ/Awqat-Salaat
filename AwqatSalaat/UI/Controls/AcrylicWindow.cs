@@ -148,6 +148,38 @@ namespace AwqatSalaat.UI.Controls
             };
         }
 
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            HwndSource source = HwndSource.FromHwnd(new WindowInteropHelper(this).Handle);
+            source.AddHook(WndProc);
+        }
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            const int WM_ENTERSIZEMOVE = 0x0231;
+            const int WM_EXITSIZEMOVE = 0x0232;
+
+            if (msg == WM_ENTERSIZEMOVE)
+            {
+                // User started dragging or resizing
+                // Disable blur effect to enhance performance
+                if (this.EnableAcrylicEffect)
+                {
+                    DisableBlur();
+                }
+            }
+            else if (msg == WM_EXITSIZEMOVE)
+            {
+                // User released the mouse
+                if (this.EnableAcrylicEffect)
+                {
+                    EnableBlur(false);
+                }
+            }
+            return IntPtr.Zero;
+        }
+
         private void Maximize_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = e.Parameter is Window window && window.WindowState == WindowState.Normal;
@@ -251,6 +283,36 @@ namespace AwqatSalaat.UI.Controls
                     var ptr = Marshal.AllocHGlobal(attrSize);
                     Marshal.StructureToPtr(attr, ptr, false);
                     Dwmapi.DwmSetWindowAttribute(Handle, DWMWINDOWATTRIBUTE.DWMWA_NCRENDERING_POLICY, ptr, attrSize);
+                    Marshal.FreeHGlobal(ptr);
+                }
+            }
+        }
+
+        private void DisableBlur()
+        {
+            var hwndSource = PresentationSource.FromVisual(this) as HwndSource;
+            var handle = hwndSource.Handle;
+
+            if (hwndSource != null)
+            {
+                if (Helpers.SystemInfos.IsWindows10)
+                {
+                    AcrylicBlur.DisableAcrylicBlur(handle);
+                }
+                else if (Helpers.SystemInfos.IsWindows81_OrEarlier)
+                {
+                    // Win 8/8.1 doesn't support blur behind
+                    if (Helpers.SystemInfos.IsWindows7)
+                    {
+                        AcrylicBlur.EnableBlurBehindWin7(handle, false);
+                    }
+
+                    int attr = (int)DWMNCRENDERINGPOLICY.DWMNCRP_DISABLED;
+
+                    int attrSize = Marshal.SizeOf(attr);
+                    var ptr = Marshal.AllocHGlobal(attrSize);
+                    Marshal.StructureToPtr(attr, ptr, false);
+                    Dwmapi.DwmSetWindowAttribute(handle, DWMWINDOWATTRIBUTE.DWMWA_NCRENDERING_POLICY, ptr, attrSize);
                     Marshal.FreeHGlobal(ptr);
                 }
             }

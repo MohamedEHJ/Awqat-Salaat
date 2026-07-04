@@ -22,11 +22,11 @@
     </controls:PrayersPanel.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" MinHeight="16"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Border CornerRadius="{ThemeResource ControlCornerRadius}" Background="{ThemeResource ControlAltFillColorQuarternaryBrush}" Margin="0,16,0,4" HorizontalAlignment="Center" Grid.Row="0">
+        <Border CornerRadius="{ThemeResource ControlCornerRadius}" Background="{ThemeResource ControlAltFillColorQuarternaryBrush}" Margin="0,16,0,4" HorizontalAlignment="Center" Grid.Row="0" Visibility="{x:Bind ViewModel.WidgetSettings.Settings.ShowLocation}">
             <Grid Margin="8,4" FlowDirection="LeftToRight">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>

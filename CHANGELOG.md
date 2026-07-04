@@ -1,3 +1,35 @@
+### v4.2.3
+
+- Fixed a regression related to showing content on the lock screen. (WinUI through Microsoft Store only)
+- Fixed bugs in handling duplicated primary display. (WinUI only)
+
+### v4.2.2
+
+- Implemented a fix for the re-rentrancy bug caused by TileNotification in the widget's button Loaded event. (WinUI through Microsoft Store only)
+
+### v4.2.1
+
+- Avoid the port exhaustion problem in service clients.
+- Implemented a fix for the re-rentrancy bug caused by TileNotification in the widget's ~~Loaded~~ *settings updated* event. (WinUI through Microsoft Store only)
+
+### v4.2
+
+- Support multi-display desktops. (WinUI only)
+- Show/hide the location in the prayers panel.
+- Show prayer time and countdown on the lock screen. (WinUI through Microsoft Store only)
+- Control the widget's button background. (Only solid color is supported for now) (WinUI only)
+- Added a button to auto-detect the location from the system at any time.
+- Ignore text size scale from Windows Accessibility settings.
+- Show a toast notification after hiding the widget. (WinUI only)
+- Updated dismiss button text in reminder notification and in time entered notification. (WinUI only)
+- Show clearer process architecture in the **About** page. (WinUI only)
+- Improved the performance of AcrylicWindow when dragging the window. (Deskband only)
+- Fixed a bug in QCH service when the widget starts between Isha and midnight.
+- Fixed re-entrancy bug in ToggleButton. (Not confirmed yet) (WinUI only)
+- Fixed a bug in DesktopAcrylicSystemBackdrop. (WinUI only)
+- Fixed a bug in LocaleManager during settings loading.
+- Renamed CustomizedFlyout and CustomizedMenuFlyout to FlyoutEx and MenuFlyoutEx respectively. (WinUI only)
+
 ### v4.1.2
 
 - Implement a workaround for QCH service to show fake data after Isha before getting fresh data at midnight.

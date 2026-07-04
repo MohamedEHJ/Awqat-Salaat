@@ -50,7 +50,7 @@
                 <TextBlock Text="{Binding DisplayedDate, Converter={StaticResource GregorianDateConverter}, ConverterParameter='dd MMMM yyyy'}" Language="en" Margin="0,0,0,0"/>
             </StackPanel>
         </StackPanel>
-        <StackPanel x:Name="locationPanel" Orientation="Horizontal" TextBlock.Foreground="{DynamicResource ThemeColors.TextTertiaryBrush}" Margin="0,4" MaxWidth="200" HorizontalAlignment="Center" Grid.Row="1" FlowDirection="LeftToRight" SizeChanged="LocationPanel_SizeChanged">
+        <StackPanel x:Name="locationPanel" Orientation="Horizontal" TextBlock.Foreground="{DynamicResource ThemeColors.TextTertiaryBrush}" Margin="0,4" MaxWidth="200" HorizontalAlignment="Center" Grid.Row="1" FlowDirection="LeftToRight" Visibility="{Binding WidgetSettings.Settings.ShowLocation, Converter={StaticResource BoolVisConverter}}" SizeChanged="LocationPanel_SizeChanged" d:Visibility="Visible">
             <TextBlock d:Text="City" Text="{Binding City}" HorizontalAlignment="Center"/>
             <Rectangle Height="1" Width="8" Fill="{DynamicResource ThemeColors.ControlBorderBrush}" HorizontalAlignment="Center" Margin="8,5,8,3"/>
             <TextBlock d:Text="Country" Text="{Binding Country}" HorizontalAlignment="Center"/>

@@ -624,7 +624,7 @@
                             <controls:SettingsItem Margin="0" Header="{mk:I18n UI.Settings.LocationByCoordinates}" Description="{mk:I18n UI.Settings.LocationByCoordinatesDescription}" IsEnabled="{Binding Locator.DetectByCoordinates, Mode=OneWay}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="150"/>
+                                        <ColumnDefinition Width="160"/>
                                         <ColumnDefinition Width="150"/>
                                         <ColumnDefinition/>
                                     </Grid.ColumnDefinitions>
@@ -639,14 +639,17 @@
                                     <TextBox Text="{Binding Realtime.Latitude}" Grid.Column="1"/>
                                     <TextBlock Text="{mk:I18n UI.Settings.Longitude}" Grid.Row="2"/>
                                     <TextBox Text="{Binding Realtime.Longitude}" Grid.Column="1" Grid.Row="2"/>
-                                    <Button Content="{mk:I18n UI.Settings.Check}" Command="{Binding Locator.Check}" Width="50" Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                                    <DockPanel Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Visibility="{Binding Locator.PendingCheck, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <StackPanel Orientation="Horizontal" Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                        <Button Content="{mk:I18n UI.Settings.Check}" Command="{Binding Locator.Check}" Width="50"/>
+                                        <Button Content="{mk:I18n UI.Settings.AutoDetect}" Width="100" Margin="4,0" Click="DetectLocation_Click"/>
+                                    </StackPanel>
+                                    <DockPanel Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Visibility="{Binding Locator.PendingCheck, Converter={StaticResource BooleanToVisibilityConverter}}" d:Visibility="Visible">
                                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" Margin="8,0,0,0" VerticalAlignment="Center">
                                             <Button Style="{DynamicResource IconButtonStyle}" Content="&#xE711;" Command="{Binding Locator.CancelCheck}" ToolTip="{mk:I18n UI.Settings.Cancel}" Visibility="{Binding Locator.PendingCheck, Converter={StaticResource BooleanToVisibilityConverter}}" d:Visibility="Visible"/>
                                             <Button Style="{DynamicResource IconButtonStyle}" Content="&#xE8FB;" Command="{Binding Locator.ConfirmCheck}" ToolTip="{mk:I18n UI.Settings.Confirm}" Visibility="{Binding Locator.HasCheckResult, Converter={StaticResource BooleanToVisibilityConverter}}" d:Visibility="Visible"/>
                                         </StackPanel>
                                         <Grid>
-                                            <TextBlock Text="{Binding Locator.PendingPlace.DisplayName}" VerticalAlignment="Center" MaxWidth="400" TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding Locator.PendingPlace.DisplayName}" VerticalAlignment="Center" MaxWidth="390" TextWrapping="Wrap"/>
                                             <Grid Visibility="{Binding Locator.IsChecking, Converter={StaticResource BoolToVisibilityInvertedConverter}}">
                                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"  Visibility="{Binding Locator.HasCheckResult, Converter={StaticResource BoolToVisibilityInvertedConverter}}">
                                                     <TextBlock Text="{mk:I18n UI.Panel.Error}" Foreground="{DynamicResource ThemeColors.TextTertiaryBrush}" HorizontalAlignment="Center" Visibility="{Binding Locator.HasError, Converter={StaticResource BooleanToVisibilityConverter}}"/>
@@ -744,6 +747,9 @@
                         </controls:SettingsItem>
                         <controls:SettingsItem Header="{mk:I18n UI.Settings.ShowAyah}" Description="{mk:I18n UI.Settings.ShowAyahDescription}">
                             <CheckBox IsChecked="{Binding ShowAyah}"/>
+                        </controls:SettingsItem>
+                        <controls:SettingsItem Header="{mk:I18n UI.Settings.ShowLocation}" Description="{mk:I18n UI.Settings.ShowLocationDescription}">
+                            <CheckBox IsChecked="{Binding ShowLocation}"/>
                         </controls:SettingsItem>
                         <controls:SettingsItem Header="{mk:I18n UI.Settings.ShowGregorianDate}" Description="{mk:I18n UI.Settings.ShowGregorianDateDescription}">
                             <CheckBox IsChecked="{Binding ShowGregorianDate}"/>

@@ -158,7 +158,16 @@ namespace AwqatSalaat.Properties
             UpdatePrayerConfigs();
 
             base.OnSettingsLoaded(sender, e);
-            _isLoaded = true;
+
+            if (!_isLoaded)
+            {
+                _isLoaded = true;
+
+                if (!IsConfigured)
+                {
+                    Upgrade();
+                }
+            }
         }
 
         protected override void OnSettingsSaving(object sender, CancelEventArgs e)

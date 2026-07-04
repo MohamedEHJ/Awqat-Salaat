@@ -64,7 +64,7 @@ namespace AwqatSalaat.UI.Views
                 
                 if (!ViewModel.Settings.IsConfigured)
                 {
-                    TrySetGeolocation();
+                    TrySetGeolocation(false);
                 }
             }
 
@@ -112,7 +112,7 @@ namespace AwqatSalaat.UI.Views
             csvSettings.Visibility = isCSV ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private void TrySetGeolocation()
+        private void TrySetGeolocation(bool notifyIfNotAllowed)
         {
             try
             {
@@ -126,6 +126,11 @@ namespace AwqatSalaat.UI.Views
                 }
                 else
                 {
+                    if (notifyIfNotAllowed && started)
+                    {
+                        MessageBox.Show(LocaleManager.Default.Get("Dialog.LocationAccessDenied"), LocaleManager.Default.Get("Data.AppName"), MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+
                     Log.Information("Auto-geolocation: " + (started ? "Access denied" : "Watcher not started"));
                 }
             }
@@ -370,6 +375,13 @@ namespace AwqatSalaat.UI.Views
                 ParentPopup.StaysOpen = false;
                 ParentPopup.IsTopMost = true;
             }
+        }
+
+        private void DetectLocation_Click(object sender, RoutedEventArgs e)
+        {
+            Log.Information("Clicked on Auto-detect for location");
+
+            TrySetGeolocation(true);
         }
     }
 }

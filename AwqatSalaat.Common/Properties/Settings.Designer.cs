@@ -1126,5 +1126,65 @@ namespace AwqatSalaat.Properties {
                 this["Mawaqit_MasjidId"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PRIMARY")]
+        public string Display {
+            get {
+                return ((string)(this["Display"]));
+            }
+            set {
+                this["Display"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("None")]
+        public global::AwqatSalaat.Configurations.WidgetButtonBackgroundType TaskbarButtonBackgroundType {
+            get {
+                return ((global::AwqatSalaat.Configurations.WidgetButtonBackgroundType)(this["TaskbarButtonBackgroundType"]));
+            }
+            set {
+                this["TaskbarButtonBackgroundType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#7F7F7F7F")]
+        public string TaskbarButtonBackgroundSolidColor {
+            get {
+                return ((string)(this["TaskbarButtonBackgroundSolidColor"]));
+            }
+            set {
+                this["TaskbarButtonBackgroundSolidColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowLocation {
+            get {
+                return ((bool)(this["ShowLocation"]));
+            }
+            set {
+                this["ShowLocation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowContentOnLockScreen {
+            get {
+                return ((bool)(this["ShowContentOnLockScreen"]));
+            }
+            set {
+                this["ShowContentOnLockScreen"] = value;
+            }
+        }
     }
 }

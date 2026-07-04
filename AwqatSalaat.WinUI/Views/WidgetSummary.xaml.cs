@@ -8,7 +8,12 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Serilog;
 using System;
+using System.Linq;
 using Windows.Foundation;
+#if PACKAGED
+using Windows.Data.Xml.Dom;
+using Windows.UI.Notifications;
+#endif
 
 namespace AwqatSalaat.WinUI.Views
 {
@@ -36,6 +41,9 @@ namespace AwqatSalaat.WinUI.Views
         private bool shouldBeCompactHorizontally;
         private DisplayMode currentDisplayMode = DisplayMode.Default;
         private AudioPlayerSession currentAudioSession;
+#if PACKAGED
+        private DispatcherTimer lockScreenTimer;
+#endif
 
         private WidgetViewModel ViewModel => DataContext as WidgetViewModel;
 
@@ -61,9 +69,23 @@ namespace AwqatSalaat.WinUI.Views
             Notification.NotificationManager.DismissReminderRequested += NotificationManager_DismissReminderRequested;
             Notification.NotificationManager.StopReminderSoundRequested += NotificationManager_StopReminderSoundRequested;
             Notification.NotificationManager.StopAdhanRequested += NotificationManager_StopAdhanRequested;
+            DisplayHelper.DisplayChanged += DisplayHelper_DisplayChanged;
 
             UpdateDirection();
             UpdateNotificationSound();
+        }
+
+        private void DisplayHelper_DisplayChanged(object sender, DisplayChangedEventArgs e)
+        {
+            if (e.Reason
+                is DisplayChangedReason.Connected
+                or DisplayChangedReason.Disconnected
+                or DisplayChangedReason.PrimaryDisplay
+                or DisplayChangedReason.PrimaryDuplicated
+                or DisplayChangedReason.PrimaryDeduplicated)
+            {
+                DispatcherQueue.TryEnqueue(UpdateDisplayMenu);
+            }
         }
 
         private void NotificationManager_StopAdhanRequested()
@@ -102,7 +124,8 @@ namespace AwqatSalaat.WinUI.Views
         private void NotificationManager_ShowWidgetRequested()
         {
             Log.Information("Showing widget's panel after clicking on toast notification");
-            DispatcherQueue.TryEnqueue(() => ToggleButton_Checked(toggle, null));
+            //DispatcherQueue.TryEnqueue(() => ToggleButton_Checked(toggle, null));
+            DispatcherQueue.TryEnqueue(() => toggle.IsChecked = true);
         }
 
         private void ThemeHelper_ThemeChanged()
@@ -127,12 +150,16 @@ namespace AwqatSalaat.WinUI.Views
                 ThemeHelper.ReloadElementTheme(flyoutPresenter, currentTheme);
             }
         }
-
+        
         private void WidgetSummary_Loaded(object sender, RoutedEventArgs e)
         {
             Log.Information("Widget summary loaded");
             UpdateTheme();
             UpdateDisplayMode();
+            UpdateDisplayMenu();
+#if PACKAGED
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, InvalidateLockScreenTimer);
+#endif
         }
 
         private void WidgetSummary_Unloaded(object sender, RoutedEventArgs e)
@@ -149,8 +176,20 @@ namespace AwqatSalaat.WinUI.Views
             Notification.NotificationManager.DismissReminderRequested -= NotificationManager_DismissReminderRequested;
             Notification.NotificationManager.StopReminderSoundRequested -= NotificationManager_StopReminderSoundRequested;
             Notification.NotificationManager.StopAdhanRequested -= NotificationManager_StopAdhanRequested;
+            DisplayHelper.DisplayChanged -= DisplayHelper_DisplayChanged;
 
             currentAudioSession?.End();
+
+#if PACKAGED
+            try
+            {
+                DestroyLockScreenTimer();
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"An error occured while destroying lock screen timer in Unloaded handler: {ex?.Message}");
+            }
+#endif
         }
 
         private void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -249,6 +288,9 @@ namespace AwqatSalaat.WinUI.Views
         private void WidgetSettings_Updated(bool apiSettingsUpdated)
         {
             UpdateNotificationSound();
+#if PACKAGED
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, InvalidateLockScreenTimer);
+#endif
         }
 
         private void LocaleManager_CurrentChanged(object sender, EventArgs e)
@@ -362,10 +404,137 @@ namespace AwqatSalaat.WinUI.Views
             flyoutContent.FlowDirection = dir;
         }
 
+        private void UpdateDisplayMenu()
+        {
+            Log.Information("Updating Display context-menu");
+            int count = 0;
+            var primaryItem = displayFlyoutSubItem.Items[0] as RadioMenuFlyoutItem;
+
+            // Using displayFlyoutSubItem.Items.Clear() then calling displayFlyoutSubItem.Items.Add(primaryItem) causes crash
+            // So primaryItem need to stay in the list all the time
+            foreach (var item in displayFlyoutSubItem.Items.ToArray())
+            {
+                if (ReferenceEquals(item, primaryItem))
+                    continue;
+
+                displayFlyoutSubItem.Items.Remove(item);
+            }
+
+            primaryItem.IsChecked = ViewModel.WidgetSettings.Settings.Display == "PRIMARY";
+
+            foreach (var display in DisplayHelper.AvailableDisplays)
+            {
+                var item = new RadioMenuFlyoutItem()
+                {
+                    Text = display.Summary,
+                    GroupName = "DisplayGroup",
+                    Command = TaskBarManager.SetDisplay,
+                    CommandParameter = display.Display.DevicePath,
+                    IsChecked = ViewModel.WidgetSettings.Settings.Display == display.Display.DevicePath,
+                };
+                displayFlyoutSubItem.Items.Add(item);
+                count++;
+            }
+
+            Log.Information($"Added {count} sub-item's");
+
+            foreach (var item in displayFlyoutSubItem.Items.OfType<RadioMenuFlyoutItem>())
+            {
+                // avoid interacting with an already selected option
+                item.IsHitTestVisible = item.IsTabStop = !item.IsChecked;
+            }
+
+            displayFlyoutSubItem.Visibility = count > 1 ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         private void ToggleButton_Checked(object sender, RoutedEventArgs e)
         {
             FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
         }
+
+#if PACKAGED
+        private void InvalidateLockScreenTimer()
+        {
+            try
+            {
+                Log.Information("Invalidating lock screen timer");
+
+                if (ViewModel.WidgetSettings.Settings.ShowContentOnLockScreen)
+                {
+                    if (lockScreenTimer is null)
+                    {
+                        Log.Information("Creating a timer for lock screen");
+                        lockScreenTimer = new DispatcherTimer();
+                        lockScreenTimer.Interval = TimeSpan.FromMinutes(1);
+                        lockScreenTimer.Tick += LockScreenTimer_Tick;
+                        lockScreenTimer.Start();
+                    }
+
+                    UpdateLockScreen();
+                }
+                else
+                {
+                    DestroyLockScreenTimer();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, $"An exception was thrown during lock screen timer invalidation: {ex?.Message}");
+            }
+        }
+
+        private void DestroyLockScreenTimer()
+        {
+            if (lockScreenTimer is not null)
+            {
+                Log.Information("Destroying the lock screen timer");
+                lockScreenTimer.Stop();
+                lockScreenTimer.Tick -= LockScreenTimer_Tick;
+                lockScreenTimer = null;
+            }
+
+            TileUpdateManager.CreateTileUpdaterForApplication().Clear();
+        }
+
+        private void LockScreenTimer_Tick(object sender, object e)
+        {
+            UpdateLockScreen();
+        }
+
+        private void UpdateLockScreen()
+        {
+            try
+            {
+                if (!ViewModel.WidgetSettings.Settings.IsConfigured)
+                {
+                    return;
+                }
+
+                if (ViewModel.HasError)
+                {
+                    TileUpdateManager.CreateTileUpdaterForApplication().Clear();
+                    return;
+                }
+
+                Log.Information("Updating the content on the lock screen");
+
+                string line3 = (afterTB.Visibility == Visibility.Visible ? afterTB : sinceTB).Text + " " + countdownTB.Text;
+                string content = $"<tile><visual version=\"4\"><binding template=\"TileWide\">" +
+                    $"<text id=\"1\">{prayerTB.Text}</text>" +
+                    $"<text id=\"2\">{timeTB.Text}</text>" +
+                    $"<text id=\"3\">{line3}</text>" +
+                    $"</binding></visual></tile>";
+                var tileXml = new XmlDocument();
+                tileXml.LoadXml(content);
+                var notification = new TileNotification(tileXml);
+                TileUpdateManager.CreateTileUpdaterForApplication().Update(notification);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, $"An error occured while updating lock screen: {ex?.Message}");
+            }
+        }
+#endif
     }
 
     public enum DisplayMode

@@ -30,7 +30,8 @@ namespace AwqatSalaat.WinUI.Views
         public static readonly string Version = typeof(SettingsPanel).Assembly
             .GetCustomAttribute<AssemblyFileVersionAttribute>()?
             .Version;
-        public static readonly string Architecture = Environment.Is64BitProcess ? "64-bit" : "32-bit";
+        public static readonly string Architecture = (Environment.Is64BitProcess ? "64" : "32")
+            + $"-bit ({System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower()})";
 
         public static readonly DateTime SampleTime = new DateTime(2026, 1, 8, 18, 45, 0);
         public static readonly string[] TimePatterns = { "", "HH:mm", "hh:mm tt", "h:mm tt" };
@@ -64,6 +65,10 @@ namespace AwqatSalaat.WinUI.Views
             SetImageSource();
 
             nav.SelectionChanged += Nav_SelectionChanged;
+
+#if !PACKAGED && !DEBUG
+            lockScreenSetting.Visibility = Visibility.Collapsed;
+#endif
         }
 
         private void Nav_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -93,7 +98,7 @@ namespace AwqatSalaat.WinUI.Views
                 {
                     nav.SelectedItem = locationTab;
 
-                    TrySetGeolocation();
+                    TrySetGeolocation(false);
                 }
             }
 
@@ -145,7 +150,7 @@ namespace AwqatSalaat.WinUI.Views
             mawaqitSettings.Visibility = isMawaqit ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private async Task TrySetGeolocation()
+        private async Task TrySetGeolocation(bool notifyIfNotAllowed)
         {
             try
             {
@@ -169,6 +174,11 @@ namespace AwqatSalaat.WinUI.Views
                 }
                 else
                 {
+                    if (notifyIfNotAllowed)
+                    {
+                        MessageBox.Warning(LocaleManager.Default.Get("Dialog.LocationAccessDenied"));
+                    }
+
                     Log.Information("Auto-geolocation: Access denied");
                 }
             }
@@ -242,6 +252,12 @@ namespace AwqatSalaat.WinUI.Views
             {
                 ViewModel.Locator.SelectedPlace = place;
             }
+        }
+
+        private void LockScreenHyperlink_Click(Hyperlink sender, HyperlinkClickEventArgs args)
+        {
+            Log.Information("Clicked on Lock screen settings link");
+            Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:lockscreen"));
         }
 
         private void ContactHyperlink_Click(Hyperlink sender, HyperlinkClickEventArgs args)
@@ -458,5 +474,12 @@ namespace AwqatSalaat.WinUI.Views
         }
 
         private bool AND(bool left, bool right) => left && right;
+
+        private void DetectLocation_Click(object sender, RoutedEventArgs e)
+        {
+            Log.Information("Clicked on Auto-detect for location");
+
+            TrySetGeolocation(true);
+        }
     }
 }

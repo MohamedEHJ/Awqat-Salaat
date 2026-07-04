@@ -278,5 +278,20 @@
     <Setting Name="Mawaqit_MasjidId" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="Display" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PRIMARY</Value>
+    </Setting>
+    <Setting Name="TaskbarButtonBackgroundType" Type="AwqatSalaat.Configurations.WidgetButtonBackgroundType" Scope="User">
+      <Value Profile="(Default)">None</Value>
+    </Setting>
+    <Setting Name="TaskbarButtonBackgroundSolidColor" Type="System.String" Scope="User">
+      <Value Profile="(Default)">#7F7F7F7F</Value>
+    </Setting>
+    <Setting Name="ShowLocation" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ShowContentOnLockScreen" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

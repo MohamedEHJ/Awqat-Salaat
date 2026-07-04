@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace AwqatSalaat.WinUI.Controls
 {
-    public partial class CustomizedMenuFlyout : MenuFlyout
+    public partial class MenuFlyoutEx : MenuFlyout
     {
         private Control flyoutPresenter;
         private ElementTheme? requestedTheme;

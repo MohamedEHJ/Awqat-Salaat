@@ -41,11 +41,6 @@ namespace AwqatSalaat.ViewModels
             Save = new RelayCommand(SaveExecute);
             Cancel = new RelayCommand(CancelExecute, o => Settings.IsConfigured);
 
-            if (!Settings.IsConfigured)
-            {
-                Settings.Upgrade();
-            }
-
             if (string.IsNullOrEmpty(Settings.DisplayLanguage))
             {
                 Settings.DisplayLanguage = LocaleManager.Default.Current;
@@ -191,9 +186,9 @@ namespace AwqatSalaat.ViewModels
 
             foreach (SettingsProperty prop in Settings.Properties)
             {
-                if (prop.Name == nameof(Settings.CustomPosition))
+                if (prop.Name == nameof(Settings.CustomPosition) || prop.Name == nameof(Settings.Display))
                 {
-                    // we are not interested in custom position here and we should not affect it
+                    // we are not interested in custom position or display here and we should not affect them
                     continue;
                 }
 

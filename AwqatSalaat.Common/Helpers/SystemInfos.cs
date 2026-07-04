@@ -21,6 +21,7 @@ namespace AwqatSalaat.Helpers
         public static int OSBuildNumber => osBuildNumber;
         public static bool IsWindows7 => osBuildNumber == Windows7BuildNumber;
         public static bool IsWindows8 => osBuildNumber == Windows8BuildNumber;
+        public static bool IsWindows8_OrLater => osBuildNumber >= Windows8BuildNumber;
         public static bool IsWindows81 => osBuildNumber == Windows81BuildNumber;
         public static bool IsWindows81_OrEarlier => osBuildNumber <= Windows81BuildNumber && osBuildNumber >= Windows7BuildNumber;
         public static bool IsWindows10 => osBuildNumber >= Windows10_Min_BuildNumber && osBuildNumber < Windows11_Min_BuildNumber;
@@ -135,6 +136,26 @@ namespace AwqatSalaat.Helpers
 
                 // Widgets button is enabled by default in Windows 11
                 return true;
+            }
+
+            return false;
+        }
+
+        public static bool ShowTaskbarOnAllDisplays()
+        {
+            if (IsWindows8_OrLater)
+            {
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced"))
+                {
+                    if (key != null)
+                    {
+                        int value = Convert.ToInt32(key.GetValue("MMTaskbarEnabled", 1));
+                        return value == 1;
+                    }
+
+                    // Taskbar is shown on all displays by default
+                    return true;
+                }
             }
 
             return false;

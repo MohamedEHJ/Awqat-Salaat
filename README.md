@@ -183,6 +183,7 @@ For a list of changes, check the changelog [here](CHANGELOG.md).
 - [Adhan-csharp:](https://github.com/davidpet86/Adhan-csharp) A C# implementation of [Adhan](https://github.com/batoulapps/Adhan) which is a high precision prayer time library.
 - [Nominatim:](https://nominatim.org/) An open-source geocoding service.
 - [CsvHelper:](https://github.com/JoshClose/CsvHelper) Library to help reading and writing CSV files.
+- [WindowsDisplayAPI:](https://github.com/falahati/WindowsDisplayAPI) A .Net wrapper for Windows Display and Windows CCD APIs.
 
 ## Contact
 
