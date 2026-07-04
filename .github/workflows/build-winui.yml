@@ -72,3 +72,14 @@ jobs:
           path: AwqatSalaat.WinUI.Package/bin/**/*.msi
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish app (portable, self-contained)
+        run: msbuild AwqatSalaat.WinUI\AwqatSalaat.WinUI.csproj /t:Publish /p:Configuration=$env:Configuration /p:Platform=$env:Platform /p:PublishDir=publish/ /p:RestorePackages=false
+
+      - name: Upload portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: AwqatSalaat-WinUI-${{ env.Platform }}-${{ env.Configuration }}-portable
+          path: AwqatSalaat.WinUI/publish/**
+          if-no-files-found: error
+          retention-days: 14
