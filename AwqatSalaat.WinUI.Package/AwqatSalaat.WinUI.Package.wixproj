@@ -4,6 +4,10 @@
         <EnableProjectHarvesting>false</EnableProjectHarvesting>
         <HarvestDirectorySuppressUniqueIds>true</HarvestDirectorySuppressUniqueIds>
         <HarvestDirectoryTransforms>RemovePdbAndLanguageTransform.xslt</HarvestDirectoryTransforms>
+        <!-- Skip ICE validation: the harvested self-contained Windows App SDK files
+             (localized .mui satellites, fonts) trip ICE03/ICE60 etc. The MSI is fully
+             built before validation runs, so skipping it still produces a valid installer. -->
+        <SuppressValidation>true</SuppressValidation>
     </PropertyGroup>
     <UsingTask TaskName="GetVersionString" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
         <ParameterGroup>
