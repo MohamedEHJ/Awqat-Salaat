@@ -5,6 +5,7 @@ using AwqatSalaat.Services.AlAdhan;
 using AwqatSalaat.Services.SalahHour;
 using AwqatSalaat.Services.Local;
 using AwqatSalaat.Services.CSV;
+using AwqatSalaat.Services.MawaqitApiSelfHosted;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -97,6 +98,7 @@ namespace AwqatSalaat.ViewModels
             }
             catch (Exception ex)
             {
+                Log.Warning(ex, "Failed to refresh calendar: {message}", ex.Message);
 #if DEBUG
                 throw;
 #endif
@@ -157,6 +159,8 @@ namespace AwqatSalaat.ViewModels
                     return new LocalClient();
                 case PrayerTimesService.CSV:
                     return new CsvClient();
+                case PrayerTimesService.MawaqitApiSelfHosted:
+                    return new MawaqitApiSelfHostedClient();
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -192,6 +196,13 @@ namespace AwqatSalaat.ViewModels
                     break;
                 case PrayerTimesService.CSV:
                     request = BuildCsvRequest();
+                    break;
+                case PrayerTimesService.MawaqitApiSelfHosted:
+                    request = new MawaqitApiSelfHostedRequest
+                    {
+                        BaseUrl = Settings.Mawaqit_BaseUrl,
+                        MasjidId = Settings.Mawaqit_MasjidId,
+                    };
                     break;
                 default:
                     return null;
