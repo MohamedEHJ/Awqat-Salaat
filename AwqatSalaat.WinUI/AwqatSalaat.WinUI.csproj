@@ -47,6 +47,19 @@
       <Content Remove="Assets\Vectors.xaml" />
     </ItemGroup>
 
+    <!--
+      Unpackaged builds register app notifications with a loose icon file
+      (App.GetFullPathToAsset -> {appDir}\Assets\app_icon_32.png). Force that
+      asset to be copied next to the executable, otherwise AppNotificationManager
+      .Register() throws DirectoryNotFoundException (surfaced misleadingly as a
+      "Windows App Runtime Singleton" error).
+    -->
+    <ItemGroup>
+      <Content Update="Assets\app_icon_32.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
     <ItemGroup>
         <None Remove="Themes\Accents.xaml" />
         <None Remove="Themes\Generic.xaml" />

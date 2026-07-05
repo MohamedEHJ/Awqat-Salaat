@@ -38,7 +38,18 @@ namespace AwqatSalaat.WinUI.Notification
             AppNotificationManager.Default.Register();
 #else
             string iconPath = App.GetFullPathToAsset("app_icon_32.png");
-            AppNotificationManager.Default.Register(LocaleManager.Default.Get("Data.AppName"), new Uri(iconPath));
+
+            if (System.IO.File.Exists(iconPath))
+            {
+                AppNotificationManager.Default.Register(LocaleManager.Default.Get("Data.AppName"), new Uri(iconPath));
+            }
+            else
+            {
+                // Fall back to a registration without a custom icon so notifications
+                // still work if the loose asset isn't deployed next to the executable.
+                Log.Warning("Notification icon not found at {path}; registering without a custom icon", iconPath);
+                AppNotificationManager.Default.Register();
+            }
 #endif
             m_isRegistered = true;
 
